@@ -1,0 +1,73 @@
+2025-11-14 08:52:07 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 10:20:27 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 15:09:37 [main] INFO  f.p.cda24060.swingUI.MainSwingUI - Médecin créé en base : ID=7, Nom=Martin Paul
+2025-11-14 15:09:37 [main] INFO  f.p.cda24060.swingUI.MainSwingUI - Médecin créé en base : ID=8, Nom=Robert François
+2025-11-14 15:09:37 [main] INFO  f.p.cda24060.swingUI.MainSwingUI - Médecin créé en base : ID=9, Nom=Dubois Anne
+2025-11-14 15:09:37 [main] INFO  f.p.cda24060.swingUI.MainSwingUI - Médecin créé en base : ID=10, Nom=Morel Hélène
+2025-11-14 15:09:37 [main] INFO  f.p.cda24060.swingUI.MainSwingUI - Médecin créé en base : ID=11, Nom=Lefevre Julien
+2025-11-14 15:09:37 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 15:11:09 [main] ERROR f.p.cda24060.swingUI.MainSwingUI - Erreur lors de l'initialisation
+java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'martinpaul@gmail.com' for key 'lieu.lieu_email'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:109)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:988)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1166)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1101)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1448)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:1084)
+	at fr.pompey.cda24060.DAO.LieuDAO.create(LieuDAO.java:36)
+	at fr.pompey.cda24060.DAO.MedecinDAO.create(MedecinDAO.java:33)
+	at fr.pompey.cda24060.swingUI.MainSwingUI.initialisation(MainSwingUI.java:64)
+	at fr.pompey.cda24060.swingUI.MainSwingUI.main(MainSwingUI.java:29)
+2025-11-14 15:11:10 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 15:12:15 [main] ERROR f.p.cda24060.swingUI.MainSwingUI - Erreur lors de l'initialisation
+java.sql.SQLIntegrityConstraintViolationException: Duplicate entry 'martinpaul@gmail.com' for key 'lieu.lieu_email'
+	at com.mysql.cj.jdbc.exceptions.SQLError.createSQLException(SQLError.java:109)
+	at com.mysql.cj.jdbc.exceptions.SQLExceptionsMapping.translateException(SQLExceptionsMapping.java:114)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeInternal(ClientPreparedStatement.java:988)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1166)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdateInternal(ClientPreparedStatement.java:1101)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeLargeUpdate(ClientPreparedStatement.java:1448)
+	at com.mysql.cj.jdbc.ClientPreparedStatement.executeUpdate(ClientPreparedStatement.java:1084)
+	at fr.pompey.cda24060.DAO.LieuDAO.create(LieuDAO.java:36)
+	at fr.pompey.cda24060.DAO.MedecinDAO.create(MedecinDAO.java:33)
+	at fr.pompey.cda24060.swingUI.MainSwingUI.initialisation(MainSwingUI.java:64)
+	at fr.pompey.cda24060.swingUI.MainSwingUI.main(MainSwingUI.java:29)
+2025-11-14 15:12:15 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 15:47:42 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-14 16:14:19 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-16 22:35:44 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 14:35:06 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 14:39:56 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:09:23 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:12:19 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:15:47 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:16:43 [AWT-EventQueue-0] INFO  f.p.cda24060.swingUI.MainSwingUI - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:19:58 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:22:54 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:25:47 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:34:16 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 15:36:40 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 17:34:17 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 17:36:00 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 17:40:37 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-17 17:47:13 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 08:31:18 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 08:32:17 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 08:32:39 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 08:33:24 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 08:34:25 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 10:58:52 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:03:49 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:06:56 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:07:51 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:12:09 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:51:16 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 11:59:40 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 13:10:07 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 14:10:09 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 15:49:00 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 16:46:48 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 17:00:51 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 17:02:49 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-18 17:08:00 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
