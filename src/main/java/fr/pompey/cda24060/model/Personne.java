@@ -20,10 +20,11 @@ public class Personne {
      * @param pPrenom  the prenom
      * @param lieu     the lieu
      * @param mutuelle the mutuelle
+     * @param medecin
      * @throws SaisieException the saisie exception
      */
-    // constructeur de lma classe personne
-    public Personne(String pNom, String pPrenom, Lieu lieu,Mutuelle mutuelle) throws SaisieException {
+    // constructeur de ma classe personne
+    public Personne(String pNom, String pPrenom, Lieu lieu, Mutuelle mutuelle, Medecin medecin) throws SaisieException {
         this.setNom(pNom);
         this.setPrenom(pPrenom);
         this.setLieu(lieu);
@@ -153,6 +154,9 @@ public class Personne {
         }
         if (getMutuelle() != null) {
             sbper.append(getMutuelle().getNom()).append("\n");
+        }
+        if (getMedecin() != null) {
+            sbper.append(getMedecin().getNom()).append(getMedecin().getPrenom()).append("\n");
         }
         return sbper.toString();
     }

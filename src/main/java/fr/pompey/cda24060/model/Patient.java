@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Random;
 
 public class Patient extends Personne {
-
     // Attributs
     private int Id_Patient;
     private String numeroSecuriteSociale;
@@ -23,9 +22,10 @@ public class Patient extends Personne {
                    String prenom,
                    LocalDate dateNaissance,
                    Lieu lieu,
-                   Mutuelle mutuelle) throws SaisieException {
+                   Mutuelle mutuelle,
+                   Medecin medecin) throws SaisieException {
 
-        super(nom, prenom, lieu, mutuelle);
+        super(nom, prenom, lieu, mutuelle, medecin);
 
         this.setPatDateNaissance(Date.valueOf(dateNaissance));
         this.numeroSecuriteSociale = generateNumSecu();
@@ -37,9 +37,10 @@ public class Patient extends Personne {
                    Date dateNaissance,
                    Lieu lieu,
                    Mutuelle mutuelle,
+                   Medecin medecin,
                    String numeroSecu) throws SaisieException {
 
-        super(nom, prenom, lieu, mutuelle);
+        super(nom, prenom, lieu, mutuelle, medecin);
 
         this.setPatDateNaissance(Date.valueOf(dateNaissance.toLocalDate()));
         this.numeroSecuriteSociale = numeroSecu;

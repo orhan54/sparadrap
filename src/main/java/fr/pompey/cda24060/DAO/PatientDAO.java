@@ -22,7 +22,7 @@ public class PatientDAO implements InterfaceDAO<Patient> {
 
     @Override
     public Patient create(Patient patient) throws SQLException {
-        String sql = "INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try {
             // Créer d'abord le lieu
@@ -37,6 +37,7 @@ public class PatientDAO implements InterfaceDAO<Patient> {
                 stmt.setDate(4, Date.valueOf(patient.getPatDateNaissance()));
                 stmt.setInt(5, patient.getLieu().getId_Lieu());
                 stmt.setInt(6, patient.getMutuelle().getId_Mutuelle());
+                stmt.setInt(7, patient.getMedecin().getId_Medecin());
 
                 int affectedRows = stmt.executeUpdate();
                 if (affectedRows == 0) {
@@ -84,10 +85,11 @@ public class PatientDAO implements InterfaceDAO<Patient> {
     @Override
     public List<Patient> getAll() throws SQLException {
         List<Patient> patients = new ArrayList<>();
-        String sql = "SELECT p.*, l.*, mut.*" +
+        String sql = "SELECT p.*, l.*, mut.*, m.*" +
                 "FROM Patient AS p " +
                 "JOIN Lieu AS l ON p.Id_Lieu = l.Id_Lieu " +
-                "JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle ";
+                "JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle " +
+                "JOIN Medecin AS m ON p.Id_Medecin = m.Id_Medecin";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -152,16 +154,25 @@ public class PatientDAO implements InterfaceDAO<Patient> {
                 rs.getInt("mut_num_departement"),
                 lieu
         );
-
         mutuelle.setId_Mutuelle(rs.getInt("Id_Mutuelle"));
 
         // ----- PATIENT -----
+        Medecin medecin = new Medecin(
+            rs.getString("med_nom"),
+            rs.getString("med_prenom"),
+            rs.getString("med_numero_agreement"),
+            lieu
+        );
+        medecin.setId_Medecin(rs.getInt("Id_Medecin"));
+
+        // ----- PATIENT -----
         Patient patient = new Patient(
-                rs.getString("pat_nom"),
-                rs.getString("pat_prenom"),
-                rs.getDate("pat_date_naissance").toLocalDate(),
-                lieu,
-                mutuelle
+            rs.getString("pat_nom"),
+            rs.getString("pat_prenom"),
+            rs.getDate("pat_date_naissance").toLocalDate(),
+            lieu,
+            mutuelle,
+            medecin
         );
         patient.setId_Patient(rs.getInt("Id_Patient"));
 

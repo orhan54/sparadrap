@@ -36,7 +36,7 @@ public class consulterPatient extends JFrame {
     private JFrame previousFrame;
     private PatientDAO patientDAO;
 
-    private DefaultTableModel tableModelClient;
+    private DefaultTableModel tableModelPatient;
 
     public consulterPatient(JFrame previousFrame) throws SaisieException {
         this.previousFrame = previousFrame;
@@ -63,8 +63,8 @@ public class consulterPatient extends JFrame {
         this.setContentPane(contentPane);
 
         String[] colonnes = {"Nom", "Prenom", "Adresse", "Code postal", "Ville", "Téléphone", "Email", "Numero sécurité social", "Date de naissance", "Mutuelle", "Medecin"};
-        tableModelClient = new DefaultTableModel(colonnes, 0);
-        tablePatient.setModel(tableModelClient);
+        tableModelPatient = new DefaultTableModel(colonnes, 0);
+        tablePatient.setModel(tableModelPatient);
 
         // Charger les patients depuis la BDD
         chargerPatientsDepuisBDD();
@@ -155,7 +155,7 @@ public class consulterPatient extends JFrame {
         remplirComboBox();
 
         // Réinitialiser le tableau
-        tableModelClient.setRowCount(0);
+        tableModelPatient.setRowCount(0);
         selectedValue = null;
     }
 
@@ -179,11 +179,11 @@ public class consulterPatient extends JFrame {
                 selectedValue = selected;
 
                 if (selected.equals(comboBoxClient.getSelectedItem())) {
-                    tableModelClient.setRowCount(0);
+                    tableModelPatient.setRowCount(0);
 
                     for (Patient p : Patient.getPatients()) {
                         if (selected.equals(p.getNom() + " " + p.getPrenom())) {
-                            tableModelClient.addRow(new Object[]{
+                            tableModelPatient.addRow(new Object[]{
                                     p.getNom(),
                                     p.getPrenom(),
                                     p.getLieu().getAdresse(),
@@ -193,7 +193,8 @@ public class consulterPatient extends JFrame {
                                     p.getLieu().getEmail(),
                                     p.getPatNumeSecu(),
                                     p.getPatDateNaissance(),
-                                    p.getMutuelle().getNom()
+                                    p.getMutuelle().getNom(),
+                                    p.getMedecin().getNom()
                             });
                         }
                     }
