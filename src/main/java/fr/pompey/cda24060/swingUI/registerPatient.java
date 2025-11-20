@@ -2,6 +2,8 @@ package fr.pompey.cda24060.swingUI;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import fr.pompey.cda24060.DAO.MedecinDAO;
+import fr.pompey.cda24060.DAO.MutuelleDAO;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Lieu;
 import fr.pompey.cda24060.model.Medecin;
@@ -40,6 +42,8 @@ public class registerPatient extends JFrame {
     private JComboBox<String> comboBoxNomMedecin;
     private JComboBox<String> comboBoxMutuelle;
     private JFrame previousFrame;
+    private MedecinDAO medecinDAO;
+    private MutuelleDAO mutuelleDAO;
 
     // Patient en cours (null = création, sinon update)
     private Patient currentPatient;
@@ -136,11 +140,19 @@ public class registerPatient extends JFrame {
      */
     private void remplirComboBox() {
         comboBoxNomMedecin.removeAllItems();
+
+        comboBoxNomMedecin.addItem("Choisir un medecin");
+        comboBoxNomMedecin.setSelectedIndex(0);
+
         for (Medecin med : Medecin.getMedecins()) {
             comboBoxNomMedecin.addItem(med.getNom() + " " + med.getPrenom());
         }
 
         comboBoxMutuelle.removeAllItems();
+
+        comboBoxMutuelle.addItem("Choisir une mutuelle");
+        comboBoxMutuelle.setSelectedIndex(0);
+
         for (Mutuelle mut : Mutuelle.getMutuelles()) {
             comboBoxMutuelle.addItem(mut.getNom());
         }

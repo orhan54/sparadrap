@@ -194,7 +194,7 @@ public class consulterPatient extends JFrame {
                                     p.getPatNumeSecu(),
                                     p.getPatDateNaissance(),
                                     p.getMutuelle().getNom(),
-                                    p.getMedecin().getNom()
+                                    p.getMedecin().getNom() + " " + p.getMedecin().getPrenom()
                             });
                         }
                     }
