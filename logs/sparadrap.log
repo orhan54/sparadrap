@@ -926,3 +926,4 @@ java.lang.NullPointerException: Cannot invoke "fr.pompey.cda24060.model.Medecin.
 2025-11-20 11:53:38 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
 2025-11-20 11:54:16 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
 2025-11-20 11:54:34 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.
+2025-11-21 11:31:29 [AWT-EventQueue-0] INFO  fr.pompey.cda24060.controller.Main - L'application Swing Sparadrap a démarré avec succès.

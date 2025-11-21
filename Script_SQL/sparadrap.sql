@@ -53,24 +53,15 @@ CREATE TABLE IF NOT EXISTS Mutuelle(
     FOREIGN KEY(Id_Lieu) REFERENCES Lieu(Id_Lieu) ON DELETE SET NULL
     );
 
--- Table type medecin
-CREATE TABLE IF NOT EXISTS TYPE_Medecin(
-    Id_TYPE_Medecin INT AUTO_INCREMENT,
-    label_medecin VARCHAR(30) NOT NULL,
-    PRIMARY KEY(Id_TYPE_Medecin)
-    );
-
 -- Table Medecin
 CREATE TABLE IF NOT EXISTS Medecin(
     Id_Medecin INT AUTO_INCREMENT,
     med_nom VARCHAR(30) NOT NULL,
     med_prenom VARCHAR(50) NOT NULL,
     med_numero_agreement VARCHAR(11) NOT NULL,
-    Id_TYPE_Medecin INT NOT NULL,
     Id_Lieu INT NOT NULL,
     PRIMARY KEY(Id_Medecin),
     UNIQUE(med_numero_agreement),
-    FOREIGN KEY(Id_TYPE_Medecin) REFERENCES TYPE_Medecin(Id_TYPE_Medecin),
     FOREIGN KEY(Id_Lieu) REFERENCES Lieu(Id_Lieu) ON DELETE CASCADE
     );
 
@@ -165,19 +156,12 @@ INSERT INTO Mutuelle(mut_nom, mut_taux_prise_en_charge, mut_num_departement, Id_
         ("SwissLife", 30, 33, 5);
 
 
-INSERT INTO TYPE_Medecin(label_medecin) VALUES
-        ("Cardiologie"),
-        ("Dermatologie"),
-        ("Neurologie"),
-        ("Pédiatrie"),
-        ("Gastro-entérologie");
-
-INSERT INTO Medecin(med_nom, med_prenom, med_numero_agreement, ID_TYPE_Medecin, Id_Lieu) VALUES
-        ("Lambert", "Pierre", "18469275106", 1, 1),
-        ("Girard", "Julie", "54978558429", 2, 2),
-        ("Faure", "Nicolas", "37842598556", 3, 3),
-        ("Marchand", "Elise", "75146935297", 4, 4),
-        ("Picard", "Hugo", "82454120563", 5, 5);
+INSERT INTO Medecin(med_nom, med_prenom, med_numero_agreement, Id_Lieu) VALUES
+        ("Lambert", "Pierre", "18469275106", 1),
+        ("Girard", "Julie", "54978558429", 2),
+        ("Faure", "Nicolas", "37842598556", 3),
+        ("Marchand", "Elise", "75146935297", 4),
+        ("Picard", "Hugo", "82454120563", 5);
 
 
 INSERT INTO Patient(pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES
