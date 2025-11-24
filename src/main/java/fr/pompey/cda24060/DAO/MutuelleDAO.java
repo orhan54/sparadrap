@@ -10,13 +10,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MutuelleDAO implements InterfaceDAO<Mutuelle> {
-
-    private Connection connection;
-
-    public MutuelleDAO() throws SQLException, IOException, ClassNotFoundException {
-        this.connection = Singleton.getInstanceDB();
-    }
+public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
 
     @Override
     public Mutuelle create(Mutuelle mutuelle) throws SQLException {
@@ -153,4 +147,10 @@ public class MutuelleDAO implements InterfaceDAO<Mutuelle> {
 
         return mutuelle;
     }
+
+    @Override
+    public void closeConnection() throws SQLException {
+        super.closeConnection();
+    }
+
 }

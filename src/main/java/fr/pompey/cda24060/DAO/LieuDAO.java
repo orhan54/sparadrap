@@ -11,13 +11,7 @@ import java.util.List;
 /**
  * DAO pour la gestion des lieux en base de données
  */
-public class LieuDAO implements InterfaceDAO<Lieu> {
-
-    private Connection connection;
-
-    public LieuDAO() throws SQLException, ClassNotFoundException, java.io.IOException {
-        this.connection = Singleton.getInstanceDB();
-    }
+public class LieuDAO extends InterfaceDAO<Lieu> {
 
     /**
      * Créer un nouveau lieu dans la base de données
@@ -143,4 +137,10 @@ public class LieuDAO implements InterfaceDAO<Lieu> {
         lieu.setId_Lieu(rs.getInt("Id_Lieu"));
         return lieu;
     }
+
+    @Override
+    public void closeConnection() throws SQLException {
+        super.closeConnection();
+    }
+
 }

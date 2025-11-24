@@ -19,8 +19,8 @@ CREATE TABLE IF NOT EXISTS Lieu(
 
 -- Table Pharmacie
 CREATE TABLE IF NOT EXISTS Pharmacie(
-    Id_Pharmacie INT AUTO_INCREMENT,
-    pha_nom VARCHAR(30) NOT NULL,
+                                        Id_Pharmacie INT AUTO_INCREMENT,
+                                        pha_nom VARCHAR(30) NOT NULL,
     pha_prenom VARCHAR(50) NOT NULL,
     Id_Lieu INT NOT NULL,
     PRIMARY KEY(Id_Pharmacie),

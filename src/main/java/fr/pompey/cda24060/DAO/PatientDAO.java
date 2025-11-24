@@ -1,61 +1,49 @@
 package fr.pompey.cda24060.DAO;
 
-import fr.pompey.cda24060.dataBase.Singleton;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Patient;
 import fr.pompey.cda24060.model.Lieu;
 import fr.pompey.cda24060.model.Mutuelle;
 import fr.pompey.cda24060.model.Medecin;
 
-import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PatientDAO implements InterfaceDAO<Patient> {
-
-    private Connection connection;
-
-    public PatientDAO() throws SQLException, IOException, ClassNotFoundException {
-        this.connection = Singleton.getInstanceDB();
-    }
+public class PatientDAO extends InterfaceDAO<Patient> {
 
     @Override
     public Patient create(Patient patient) throws SQLException {
         String sql = "INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-        try {
-            // Créer d'abord le lieu
-            LieuDAO lieuDAO = new LieuDAO();
-            Lieu lieu = lieuDAO.create(patient.getLieu());
-            patient.setLieu(lieu);
+        // Créer d'abord le lieu
+        LieuDAO lieuDAO = new LieuDAO();
+        Lieu lieu = lieuDAO.create(patient.getLieu());
+        patient.setLieu(lieu);
 
-            try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-                stmt.setString(1, patient.getNom());
-                stmt.setString(2, patient.getPrenom());
-                stmt.setString(3, patient.getPatNumeSecu());
-                stmt.setDate(4, Date.valueOf(patient.getPatDateNaissance()));
-                stmt.setInt(5, patient.getLieu().getId_Lieu());
-                stmt.setInt(6, patient.getMutuelle().getId_Mutuelle());
-                stmt.setInt(7, patient.getMedecin().getId_Medecin());
+        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, patient.getNom());
+            stmt.setString(2, patient.getPrenom());
+            stmt.setString(3, patient.getPatNumeSecu());
+            stmt.setDate(4, Date.valueOf(patient.getPatDateNaissance()));
+            stmt.setInt(5, patient.getLieu().getId_Lieu());
+            stmt.setInt(6, patient.getMutuelle().getId_Mutuelle());
+            stmt.setInt(7, patient.getMedecin().getId_Medecin());
 
-                int affectedRows = stmt.executeUpdate();
-                if (affectedRows == 0) {
-                    throw new SQLException("Échec de la création du patient, aucune ligne affectée.");
-                }
-
-                try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        patient.setId_Patient(generatedKeys.getInt(1));
-                    } else {
-                        throw new SQLException("Échec de la création du médecin, aucun ID généré.");
-                    }
-                }
-
-                return patient;
+            int affectedRows = stmt.executeUpdate();
+            if (affectedRows == 0) {
+                throw new SQLException("Échec de la création du patient, aucune ligne affectée.");
             }
-        } catch (ClassNotFoundException | java.io.IOException e) {
-            throw new SQLException("Erreur lors de l'initialisation de LieuDAO : " + e.getMessage());
+
+            try (ResultSet generatedKeys = stmt.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    patient.setId_Patient(generatedKeys.getInt(1));
+                } else {
+                    throw new SQLException("Échec de la création du médecin, aucun ID généré.");
+                }
+            }
+
+            return patient;
         }
     }
 
@@ -107,6 +95,10 @@ public class PatientDAO implements InterfaceDAO<Patient> {
     public boolean update(Patient patient) throws SQLException {
         String query = "UPDATE Patient SET pat_nom = ?, pat_prenom = ?, pat_num_secu = ?, " +
                 "pat_date_naissance = ?, Id_Lieu = ?, Id_Mutuelle = ?, Id_Medecin = ? WHERE Id_Patient = ?";
+
+        // Mettre à jour d'abord le lieu
+        LieuDAO lieuDAO = new LieuDAO();
+        lieuDAO.update(patient.getLieu());
 
         try (PreparedStatement ps = connection.prepareStatement(query)) {
             ps.setString(1, patient.getNom());
@@ -233,4 +225,10 @@ public class PatientDAO implements InterfaceDAO<Patient> {
 
         return patient;
     }
+
+    @Override
+    public void closeConnection() throws SQLException {
+        super.closeConnection();
+    }
+
 }

@@ -217,17 +217,24 @@ public class consulterPatient extends JFrame {
     // Maj d'un client
     private void updateClient() {
         try {
-            String selectedClient = comboBoxClient.getSelectedItem().toString();
+            if (selectedValue == null || selectedValue.equals("Choisir un patient")) {
+                JOptionPane.showMessageDialog(this,
+                        "Veuillez sélectionner un patient à modifier",
+                        "Attention",
+                        JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             for (Patient p : Patient.getPatients()) {
-                if (selectedClient.equals(p.getNom() + " " + p.getPrenom())) {
-                    registerPatient updateClient = new registerPatient(p, this);
-                    updateClient.setVisible(true);
-                    this.setVisible(false); // Cache la fenêtre consulterClient
-                    System.out.println(p);
+                if (selectedValue.equals(p.getNom() + " " + p.getPrenom())) {
+                    registerPatient updatePatient = new registerPatient(p, this);
+                    updatePatient.setVisible(true);
+                    this.setVisible(false);
+                    break;
                 }
             }
         } catch (Exception e) {
-            System.out.println("Error sur le lancement de la view update client : " + e.getMessage());
+            System.out.println("Error updatePatient : " + e.getMessage());
         }
     }
 

@@ -68,6 +68,7 @@ public class Ordonnance {
 
     // Getters et Setters
 
+
     /**
      * Gets id ordonnance.
      *
@@ -76,6 +77,7 @@ public class Ordonnance {
     public int getId_Ordonnance() {
         return Id_Ordonnance;
     }
+
 
     /**
      * Gets date ordonnance.

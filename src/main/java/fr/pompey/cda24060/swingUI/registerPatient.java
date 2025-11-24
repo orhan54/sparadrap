@@ -327,9 +327,11 @@ public class registerPatient extends JFrame {
                 throw new SaisieException("Médecin non trouvé !");
             }
 
-            // --------------- MODE UPDATE OU CREATE ---------------
+            // Instanciation du DAO
+            PatientDAO patientDAO = new PatientDAO();
+
+            // -------- MODE UPDATE --------
             if (currentPatient != null) {
-                // -------- MODE UPDATE --------
                 currentPatient.setNom(nom);
                 currentPatient.setPrenom(prenom);
                 currentPatient.setPatNumSecu(numSecu);
@@ -346,19 +348,15 @@ public class registerPatient extends JFrame {
                 currentPatient.setMedecin(medecinChoisi);
 
                 // Mise à jour via DAO
-                boolean updated = patientDAO.update(currentPatient);
+                patientDAO.update(currentPatient);
 
-                if (updated) {
-                    JOptionPane.showMessageDialog(this,
-                            "Patient mis à jour avec succès !",
-                            "Succès",
-                            JOptionPane.INFORMATION_MESSAGE);
-                } else {
-                    throw new SaisieException("Échec de la mise à jour du patient");
-                }
+                JOptionPane.showMessageDialog(this,
+                        "Patient mis à jour avec succès !",
+                        "Succès",
+                        JOptionPane.INFORMATION_MESSAGE);
 
             } else {
-                // -------- MODE CREATE --------
+                // -------- MODE CREATION --------
                 Lieu lieu = new Lieu(adresse, email, tel, ville, codePostal);
                 Patient patient = new Patient(nom, prenom, dateNaissance.toLocalDate(),
                         lieu, mutuelleChoisie, medecinChoisi);
