@@ -128,11 +128,66 @@ public class PatientDAO implements InterfaceDAO<Patient> {
 
     @Override
     public boolean delete(int id) throws SQLException {
-        String query = "DELETE FROM Patient WHERE Id_Patient = ?";
+        Connection conn = null;
+        try {
+            conn = connection;
+            conn.setAutoCommit(false); // Démarrer une transaction
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
-            ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            // 1. Récupérer l'Id_Lieu du patient avant suppression
+            String getLieuQuery = "SELECT Id_Lieu FROM Patient WHERE Id_Patient = ?";
+            int idLieu = 0;
+
+            try (PreparedStatement ps = conn.prepareStatement(getLieuQuery)) {
+                ps.setInt(1, id);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        idLieu = rs.getInt("Id_Lieu");
+                    } else {
+                        conn.rollback();
+                        return false; // Patient n'existe pas
+                    }
+                }
+            }
+
+            // 2. Supprimer le patient (Id_Mutuelle sera mis à NULL automatiquement)
+            String deletePatientQuery = "DELETE FROM Patient WHERE Id_Patient = ?";
+            try (PreparedStatement ps = conn.prepareStatement(deletePatientQuery)) {
+                ps.setInt(1, id);
+                int rowsAffected = ps.executeUpdate();
+
+                if (rowsAffected == 0) {
+                    conn.rollback();
+                    return false;
+                }
+            }
+
+            // 3. Supprimer le lieu associé
+            String deleteLieuQuery = "DELETE FROM Lieu WHERE Id_Lieu = ?";
+            try (PreparedStatement ps = conn.prepareStatement(deleteLieuQuery)) {
+                ps.setInt(1, idLieu);
+                ps.executeUpdate();
+            }
+
+            conn.commit(); // Valider la transaction
+            return true;
+
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback(); // Annuler en cas d'erreur
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
+            }
+            throw new SQLException("Erreur lors de la suppression du patient : " + e.getMessage());
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true); // Restaurer le mode auto-commit
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 
@@ -156,23 +211,23 @@ public class PatientDAO implements InterfaceDAO<Patient> {
         );
         mutuelle.setId_Mutuelle(rs.getInt("Id_Mutuelle"));
 
-        // ----- PATIENT -----
+        // ----- MEDECIN -----
         Medecin medecin = new Medecin(
-            rs.getString("med_nom"),
-            rs.getString("med_prenom"),
-            rs.getString("med_numero_agreement"),
-            lieu
+                rs.getString("med_nom"),
+                rs.getString("med_prenom"),
+                rs.getString("med_numero_agreement"),
+                lieu
         );
         medecin.setId_Medecin(rs.getInt("Id_Medecin"));
 
         // ----- PATIENT -----
         Patient patient = new Patient(
-            rs.getString("pat_nom"),
-            rs.getString("pat_prenom"),
-            rs.getDate("pat_date_naissance").toLocalDate(),
-            lieu,
-            mutuelle,
-            medecin
+                rs.getString("pat_nom"),
+                rs.getString("pat_prenom"),
+                rs.getDate("pat_date_naissance").toLocalDate(),
+                lieu,
+                mutuelle,
+                medecin
         );
         patient.setId_Patient(rs.getInt("Id_Patient"));
 

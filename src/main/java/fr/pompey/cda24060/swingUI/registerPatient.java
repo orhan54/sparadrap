@@ -4,11 +4,13 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import fr.pompey.cda24060.DAO.MedecinDAO;
 import fr.pompey.cda24060.DAO.MutuelleDAO;
+import fr.pompey.cda24060.DAO.PatientDAO;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Lieu;
 import fr.pompey.cda24060.model.Medecin;
 import fr.pompey.cda24060.model.Mutuelle;
 import fr.pompey.cda24060.model.Patient;
+import fr.pompey.cda24060.utility.RegexUtility;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -17,11 +19,12 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Date;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 public class registerPatient extends JFrame {
-    private int id;
     private JPanel contentPane;
     private JPanel logoRegisterClient;
     private JPanel mainRegisterClient;
@@ -44,9 +47,14 @@ public class registerPatient extends JFrame {
     private JFrame previousFrame;
     private MedecinDAO medecinDAO;
     private MutuelleDAO mutuelleDAO;
+    private PatientDAO patientDAO;
 
     // Patient en cours (null = création, sinon update)
     private Patient currentPatient;
+
+    // Listes chargées depuis la BDD
+    private List<Medecin> medecins;
+    private List<Mutuelle> mutuelles;
 
     /**
      * Constructeur pour la création d'un nouveau patient
@@ -54,7 +62,20 @@ public class registerPatient extends JFrame {
     public registerPatient(JFrame previousFrame) {
         this.previousFrame = previousFrame;
 
+        // Initialiser les DAO
+        try {
+            this.medecinDAO = new MedecinDAO();
+            this.mutuelleDAO = new MutuelleDAO();
+            this.patientDAO = new PatientDAO();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de connexion à la base de données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
         initUI();
+        chargerDonneesDepuisBDD();
         remplirComboBox();
 
         // Actions boutons
@@ -71,14 +92,24 @@ public class registerPatient extends JFrame {
 
     /**
      * Constructeur pour l'édition d'un patient existant
-     *
-     * @param patient       the patient
-     * @param previousFrame la fenêtre précédente
      */
     public registerPatient(Patient patient, JFrame previousFrame) {
         this.previousFrame = previousFrame;
 
+        // Initialiser les DAO
+        try {
+            this.medecinDAO = new MedecinDAO();
+            this.mutuelleDAO = new MutuelleDAO();
+            this.patientDAO = new PatientDAO();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de connexion à la base de données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+
         initUI();
+        chargerDonneesDepuisBDD();
         remplirComboBox();
 
         this.currentPatient = patient;
@@ -93,8 +124,16 @@ public class registerPatient extends JFrame {
             textFieldRegisterEmail.setText(patient.getLieu().getEmail());
             textFieldregisterNumSecu.setText(patient.getPatNumeSecu());
             textFieldRegisterDateNaissance.setText(String.valueOf(patient.getPatDateNaissance()));
-            comboBoxMutuelle.setSelectedItem(patient.getMutuelle().getNom());
-            comboBoxNomMedecin.setSelectedItem(patient.getMedecin().getNom() + " " + patient.getMedecin().getPrenom());
+
+            // Sélectionner la mutuelle
+            if (patient.getMutuelle() != null) {
+                comboBoxMutuelle.setSelectedItem(patient.getMutuelle().getNom());
+            }
+
+            // Sélectionner le médecin
+            if (patient.getMedecin() != null) {
+                comboBoxNomMedecin.setSelectedItem(patient.getMedecin().getNom() + " " + patient.getMedecin().getPrenom());
+            }
         }
 
         // Actions boutons
@@ -103,10 +142,34 @@ public class registerPatient extends JFrame {
             try {
                 valider();
             } catch (SaisieException ex) {
-                JOptionPane.showMessageDialog(this, "Erreur sur la validation de la mise a jour patient : " + ex.getMessage());
+                JOptionPane.showMessageDialog(this,
+                        "Erreur sur la validation de la mise à jour patient : " + ex.getMessage());
             }
         });
         quitterButton.addActionListener(e -> quitter());
+    }
+
+    /**
+     * Charger les médecins et mutuelles depuis la BDD
+     */
+    private void chargerDonneesDepuisBDD() {
+        try {
+            if (medecinDAO != null) {
+                medecins = medecinDAO.getAll();
+                System.out.println("Chargement de " + medecins.size() + " médecins depuis la BDD");
+            }
+
+            if (mutuelleDAO != null) {
+                mutuelles = mutuelleDAO.getAll();
+                System.out.println("Chargement de " + mutuelles.size() + " mutuelles depuis la BDD");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -140,21 +203,23 @@ public class registerPatient extends JFrame {
      */
     private void remplirComboBox() {
         comboBoxNomMedecin.removeAllItems();
-
-        comboBoxNomMedecin.addItem("Choisir un medecin");
+        comboBoxNomMedecin.addItem("Choisir un médecin");
         comboBoxNomMedecin.setSelectedIndex(0);
 
-        for (Medecin med : Medecin.getMedecins()) {
-            comboBoxNomMedecin.addItem(med.getNom() + " " + med.getPrenom());
+        if (medecins != null) {
+            for (Medecin med : medecins) {
+                comboBoxNomMedecin.addItem(med.getNom() + " " + med.getPrenom());
+            }
         }
 
         comboBoxMutuelle.removeAllItems();
-
         comboBoxMutuelle.addItem("Choisir une mutuelle");
         comboBoxMutuelle.setSelectedIndex(0);
 
-        for (Mutuelle mut : Mutuelle.getMutuelles()) {
-            comboBoxMutuelle.addItem(mut.getNom());
+        if (mutuelles != null) {
+            for (Mutuelle mut : mutuelles) {
+                comboBoxMutuelle.addItem(mut.getNom());
+            }
         }
     }
 
@@ -163,9 +228,9 @@ public class registerPatient extends JFrame {
      */
     private void retour() {
         if (previousFrame != null) {
-            previousFrame.setVisible(true); // réaffiche la fenêtre précédente
+            previousFrame.setVisible(true);
         }
-        this.dispose(); // ferme la fenêtre actuelle
+        this.dispose();
     }
 
     /**
@@ -173,23 +238,72 @@ public class registerPatient extends JFrame {
      */
     private void valider() throws SaisieException {
         try {
-            // Champs saisis
-            String nom = textFieldRegisterNom.getText();
-            String prenom = textFieldRegisterPrenom.getText();
-            String adresse = textFieldRegisterAdresse.getText();
-            int codePostal = Integer.parseInt(textFieldRegisterCodePostal.getText());
-            String ville = textFieldRegisterVille.getText();
-            String tel = textFieldRegisterTel.getText();
-            String email = textFieldRegisterEmail.getText();
-            String numSecu = textFieldregisterNumSecu.getText();
-            String dateNaissance = textFieldRegisterDateNaissance.getText();
+            // --------------- RÉCUPÉRATION DES CHAMPS ---------------
+            String nom = textFieldRegisterNom.getText().trim();
+            String prenom = textFieldRegisterPrenom.getText().trim();
+            String adresse = textFieldRegisterAdresse.getText().trim();
+            String ville = textFieldRegisterVille.getText().trim();
+            String tel = textFieldRegisterTel.getText().trim();
+            String email = textFieldRegisterEmail.getText().trim();
+            String numSecu = textFieldregisterNumSecu.getText().trim();
+            String dateNaissanceStr = textFieldRegisterDateNaissance.getText().trim();
+            String codePostalText = textFieldRegisterCodePostal.getText().trim();
 
-            // Sélection mutuelle et médecin
+            // --------------- VALIDATION DES CHAMPS ---------------
+            if (nom.isEmpty() || prenom.isEmpty() || adresse.isEmpty() ||
+                    ville.isEmpty() || tel.isEmpty() || email.isEmpty() ||
+                    numSecu.isEmpty() || dateNaissanceStr.isEmpty() || codePostalText.isEmpty()) {
+                throw new SaisieException("Tous les champs obligatoires doivent être remplis !");
+            }
+
+            // Validation avec regex
+            if (!RegexUtility.regexAlpha(nom)) {
+                throw new SaisieException("Nom invalide !");
+            }
+            if (!RegexUtility.regexAlpha(prenom)) {
+                throw new SaisieException("Prénom invalide !");
+            }
+            if (!RegexUtility.validateAdresse(adresse)) {
+                throw new SaisieException("Adresse invalide !");
+            }
+            if (!RegexUtility.validatePhone(tel)) {
+                throw new SaisieException("Numéro de téléphone invalide !");
+            }
+            if (!RegexUtility.validate(email)) {
+                throw new SaisieException("Email invalide !");
+            }
+            if (numSecu.length() != 15) {
+                throw new SaisieException("Le numéro de sécurité sociale doit contenir 15 chiffres !");
+            }
+
+            int codePostal;
+            try {
+                codePostal = Integer.parseInt(codePostalText);
+            } catch (NumberFormatException e) {
+                throw new SaisieException("Code postal invalide ! Veuillez saisir un nombre.");
+            }
+
+            Date dateNaissance;
+            try {
+                dateNaissance = Date.valueOf(dateNaissanceStr);
+            } catch (IllegalArgumentException e) {
+                throw new SaisieException("Format de date invalide ! Utilisez le format YYYY-MM-DD");
+            }
+
+            // --------------- RÉCUPÉRATION MUTUELLE ET MÉDECIN ---------------
             String mutuelleNom = (String) comboBoxMutuelle.getSelectedItem();
             String medecinNomComplet = (String) comboBoxNomMedecin.getSelectedItem();
 
+            if (mutuelleNom == null || mutuelleNom.equals("Choisir une mutuelle")) {
+                throw new SaisieException("Veuillez sélectionner une mutuelle !");
+            }
+
+            if (medecinNomComplet == null || medecinNomComplet.equals("Choisir un médecin")) {
+                throw new SaisieException("Veuillez sélectionner un médecin !");
+            }
+
             Mutuelle mutuelleChoisie = null;
-            for (Mutuelle m : Mutuelle.getMutuelles()) {
+            for (Mutuelle m : mutuelles) {
                 if (m.getNom().equals(mutuelleNom)) {
                     mutuelleChoisie = m;
                     break;
@@ -197,7 +311,7 @@ public class registerPatient extends JFrame {
             }
 
             Medecin medecinChoisi = null;
-            for (Medecin med : Medecin.getMedecins()) {
+            for (Medecin med : medecins) {
                 String nomComplet = med.getNom() + " " + med.getPrenom();
                 if (nomComplet.equals(medecinNomComplet)) {
                     medecinChoisi = med;
@@ -205,12 +319,21 @@ public class registerPatient extends JFrame {
                 }
             }
 
+            if (mutuelleChoisie == null) {
+                throw new SaisieException("Mutuelle non trouvée !");
+            }
+
+            if (medecinChoisi == null) {
+                throw new SaisieException("Médecin non trouvé !");
+            }
+
+            // --------------- MODE UPDATE OU CREATE ---------------
             if (currentPatient != null) {
                 // -------- MODE UPDATE --------
                 currentPatient.setNom(nom);
                 currentPatient.setPrenom(prenom);
                 currentPatient.setPatNumSecu(numSecu);
-                currentPatient.setPatDateNaissance(Date.valueOf(dateNaissance));
+                currentPatient.setPatDateNaissance(dateNaissance);
 
                 Lieu lieu = currentPatient.getLieu();
                 lieu.setAdresse(adresse);
@@ -222,26 +345,53 @@ public class registerPatient extends JFrame {
                 currentPatient.setMutuelle(mutuelleChoisie);
                 currentPatient.setMedecin(medecinChoisi);
 
-                JOptionPane.showMessageDialog(this,
-                        "Patient mis à jour avec succès !",
-                        "Succès",
-                        JOptionPane.INFORMATION_MESSAGE);
+                // Mise à jour via DAO
+                boolean updated = patientDAO.update(currentPatient);
+
+                if (updated) {
+                    JOptionPane.showMessageDialog(this,
+                            "Patient mis à jour avec succès !",
+                            "Succès",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    throw new SaisieException("Échec de la mise à jour du patient");
+                }
 
             } else {
+                // -------- MODE CREATE --------
+                Lieu lieu = new Lieu(adresse, email, tel, ville, codePostal);
+                Patient patient = new Patient(nom, prenom, dateNaissance.toLocalDate(),
+                        lieu, mutuelleChoisie, medecinChoisi);
 
-                JOptionPane.showMessageDialog(this,
-                        "Nouveau patient ajouté avec succès !",
-                        "Succès",
-                        JOptionPane.INFORMATION_MESSAGE);
+                // Création via DAO
+                Patient createdPatient = patientDAO.create(patient);
+
+                if (createdPatient != null) {
+                    JOptionPane.showMessageDialog(this,
+                            "Nouveau patient ajouté avec succès !",
+                            "Succès",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    throw new SaisieException("Échec de la création du patient");
+                }
             }
 
-            // retour vers consulterClient
-            consulterPatient consulterClient = new consulterPatient(this);
-            consulterClient.setVisible(true);
+            // Retour vers consulterPatient
+            if (previousFrame instanceof consulterPatient) {
+                ((consulterPatient) previousFrame).rafraichirAffichage();
+            }
+
+            if (previousFrame != null) {
+                previousFrame.setVisible(true);
+            }
             this.dispose();
 
-        } catch (NumberFormatException e) {
-            throw new SaisieException("Code postal ou Numéro de sécu invalide !");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors de l'enregistrement : " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
         }
     }
 

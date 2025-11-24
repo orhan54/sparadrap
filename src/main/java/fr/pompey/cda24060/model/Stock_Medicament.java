@@ -22,14 +22,14 @@ public class Stock_Medicament {
     /**
      * Instantiates a new Medicament.
      *
-     * @param pMedicQuantite          the p medic quantite
-     * @param pMedicDateMiseEnService the p medic date mise en service
-     * @param pMedicPrixUnitaire           the prix
-     * @param pMedicNom               the nom
-     * @param pMedicDateEntreeStock   the p medic date entree stock
-     * @throws SaisieException the saisie exception
+     * @param pMedicQuantite            the p medic quantite
+     * @param pMedicDateMiseEnService   the p medic date mise en service
+     * @param pMedicPrixUnitaire        the prix
+     * @param pMedicNom                 the nom
+     * @param pMedicDateEntreeStock     the p medic date entree stock
+     * @throws SaisieException          the saisie exception
      */
-    // Constucteur de la classe Medicament
+// Constucteur de la classe Medicament
     public Stock_Medicament(int pMedicQuantite,
                             Date pMedicDateMiseEnService,
                             double pMedicPrixUnitaire,

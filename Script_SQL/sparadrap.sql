@@ -74,12 +74,12 @@ CREATE TABLE IF NOT EXISTS Patient(
     pat_date_naissance DATE NOT NULL,
     Id_Medecin INT NOT NULL,
     Id_Lieu INT NOT NULL,
-    Id_Mutuelle INT NOT NULL,
+    Id_Mutuelle INT,
     PRIMARY KEY(Id_Patient),
     UNIQUE(pat_num_secu),
     FOREIGN KEY(Id_Medecin) REFERENCES Medecin(Id_Medecin),
     FOREIGN KEY(Id_Lieu) REFERENCES Lieu(Id_Lieu) ON DELETE CASCADE,
-    FOREIGN KEY(Id_Mutuelle) REFERENCES Mutuelle(Id_Mutuelle)
+    FOREIGN KEY(Id_Mutuelle) REFERENCES Mutuelle(Id_Mutuelle) ON DELETE SET NULL
     );
 
 -- Table Ordonnance
@@ -126,71 +126,71 @@ CREATE TABLE IF NOT EXISTS contenir(
 -- Jeu de données pour mon application sparadrap
 -- Insert des données
 INSERT INTO Lieu(lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp) VALUES
-        ("15 rue du Moulin", "contact1@gmail.com", "+33311000001", "Nancy", 54000),
-        ("20 avenue des Vosges", "contact2@gmail.com", "+33311000002", "Metz", 57000),
-        ("7 rue du Port", "contact3@gmail.com", "+33311000003", "Toul", 54200),
-        ("3 rue des Écoles", "contact4@gmail.com", "+33311000004", "Verdun", 55100),
-        ("78 boulevard des Arts", "contact5@gmail.com", "+33311000005", "Strasbourg", 67000);
+    ("15 rue du Moulin", "contact1@gmail.com", "+33311000001", "Nancy", 54000),
+    ("20 avenue des Vosges", "contact2@gmail.com", "+33311000002", "Metz", 57000),
+    ("7 rue du Port", "contact3@gmail.com", "+33311000003", "Toul", 54200),
+    ("3 rue des Écoles", "contact4@gmail.com", "+33311000004", "Verdun", 55100),
+    ("78 boulevard des Arts", "contact5@gmail.com", "+33311000005", "Strasbourg", 67000);
 
 INSERT INTO Pharmacie(pha_nom, pha_prenom, Id_Lieu) VALUES
-        ("Durand", "Marie", 1),
-        ("Bernard", "Luc", 2),
-        ("Thomas", "Sophie", 3),
-        ("Petit", "Louis", 4),
-        ("Richard", "Emma", 5);
+    ("Durand", "Marie", 1),
+    ("Bernard", "Luc", 2),
+    ("Thomas", "Sophie", 3),
+    ("Petit", "Louis", 4),
+    ("Richard", "Emma", 5);
 
 
 INSERT INTO Stock_Medicament(medic_nom, medic_categorie, medic_quantite, medic_date_mise_en_service, medic_date_entree_stock, medic_prix_unitaire, Id_TYPE_Categorie, Id_Pharmacie) VALUES
-        ("Doliprane", "Antalgique", 120, "2023-05-01", "2023-04-28", 2.50, 1, 1),
-        ("Ibuprofène", "Anti-inflammatoire",80, "2023-06-15", "2023-06-10", 3.40, 2, 2),
-        ("Efferalgan", "Antalgique", 200, "2023-02-20", "2023-02-19", 2.20, 1, 3),
-        ("Smecta", "Digestif",150, "2023-07-12", "2023-07-10", 4.30, 3, 4),
-        ("Amoxicilline", "Antibiotique", 50, "2023-08-01", "2023-07-30", 8.60, 4, 5);
+    ("Doliprane", "Antalgique", 120, "2023-05-01", "2023-04-28", 2.50, 1, 1),
+    ("Ibuprofène", "Anti-inflammatoire",80, "2023-06-15", "2023-06-10", 3.40, 2, 2),
+    ("Efferalgan", "Antalgique", 200, "2023-02-20", "2023-02-19", 2.20, 1, 3),
+    ("Smecta", "Digestif",150, "2023-07-12", "2023-07-10", 4.30, 3, 4),
+    ("Amoxicilline", "Antibiotique", 50, "2023-08-01", "2023-07-30", 8.60, 4, 5);
 
 
 INSERT INTO Mutuelle(mut_nom, mut_taux_prise_en_charge, mut_num_departement, Id_Lieu) VALUES
-        ("Harmonie Mutuelle", 30, 54, 1),
-        ("MGEN", 30, 57, 2),
-        ("AXA Santé", 30, 67, 3),
-        ("Mutuelle Bleue", 30, 75, 4),
-        ("SwissLife", 30, 33, 5);
+    ("Harmonie Mutuelle", 30, 54, 1),
+    ("MGEN", 30, 57, 2),
+    ("AXA Santé", 30, 67, 3),
+    ("Mutuelle Bleue", 30, 75, 4),
+    ("SwissLife", 30, 33, 5);
 
 
 INSERT INTO Medecin(med_nom, med_prenom, med_numero_agreement, Id_Lieu) VALUES
-        ("Lambert", "Pierre", "18469275106", 1),
-        ("Girard", "Julie", "54978558429", 2),
-        ("Faure", "Nicolas", "37842598556", 3),
-        ("Marchand", "Elise", "75146935297", 4),
-        ("Picard", "Hugo", "82454120563", 5);
+    ("Lambert", "Pierre", "18469275106", 1),
+    ("Girard", "Julie", "54978558429", 2),
+    ("Faure", "Nicolas", "37842598556", 3),
+    ("Marchand", "Elise", "75146935297", 4),
+    ("Picard", "Hugo", "82454120563", 5);
 
 
 INSERT INTO Patient(pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES
-        ("Dupont", "Jean", 185054789012345, "1985-05-16", 1, 1, 1),
-        ("Martin", "Claire", 282067789012345, "1982-06-20", 2, 2, 2),
-        ("Robert", "Lucie", 194037789012345, "1994-03-12", 3, 3, 3),
-        ("Thomas", "Eric", 276118789012345, "1976-11-08", 4, 4, 4),
-        ("Bernard", "Julie", 201225789012345, "2001-12-25", 5, 5, 5);
+    ("Dupont", "Jean", 185054789012345, "1985-05-16", 1, 1, 1),
+    ("Martin", "Claire", 282067789012345, "1982-06-20", 2, 2, 2),
+    ("Robert", "Lucie", 194037789012345, "1994-03-12", 3, 3, 3),
+    ("Thomas", "Eric", 276118789012345, "1976-11-08", 4, 4, 4),
+    ("Bernard", "Julie", 201225789012345, "2001-12-25", 5, 5, 5);
 
 
 INSERT INTO Ordonnance(ordo_date, ordo_nom_medecin, ordo_nom_patient, Id_Medecin, Id_Patient) VALUES
-        ("2024-01-10", "Lambert Pierre", "Dupont Jean", 1, 1),
-        ("2024-02-05", "Girard Julie", "Martin Claire", 2, 2),
-        ("2024-03-20", "Faure Nicolas", "Robert Lucie", 3, 3),
-        ("2024-04-11", "Marchand Elise", "Thomas Eric", 4, 4),
-        ("2024-05-03", "Picard Hugo", "Bernard Julie", 5, 5);
+    ("2024-01-10", "Lambert Pierre", "Dupont Jean", 1, 1),
+    ("2024-02-05", "Girard Julie", "Martin Claire", 2, 2),
+    ("2024-03-20", "Faure Nicolas", "Robert Lucie", 3, 3),
+    ("2024-04-11", "Marchand Elise", "Thomas Eric", 4, 4),
+    ("2024-05-03", "Picard Hugo", "Bernard Julie", 5, 5);
 
 
 INSERT INTO Commande(com_date_commande, com_nom_medecin, com_nom_patient, com_quantite, com_prix, Id_Patient, Id_Ordonnance, Id_Pharmacie) VALUES
-        ("2024-01-12", "Lambert Pierre", "Dupont Jean", 2, 5.00, 1, 1, 1),
-        ("2024-02-06", "Girard Julie", "Martin Claire", 1, 3.40, 2, 2, 2),
-        ("2024-03-22", "Faure Nicolas", "Robert Lucie", 3, 6.60, 3, 3, 3),
-        ("2024-04-13", "Marchand Elise", "Thomas Eric", 1, 4.30, 4, 4, 4),
-        ("2024-05-05", "Picard Hugo", "Bernard Julie", 2, 17.20, 5, 5, 5);
+    ("2024-01-12", "Lambert Pierre", "Dupont Jean", 2, 5.00, 1, 1, 1),
+    ("2024-02-06", "Girard Julie", "Martin Claire", 1, 3.40, 2, 2, 2),
+    ("2024-03-22", "Faure Nicolas", "Robert Lucie", 3, 6.60, 3, 3, 3),
+    ("2024-04-13", "Marchand Elise", "Thomas Eric", 1, 4.30, 4, 4, 4),
+    ("2024-05-05", "Picard Hugo", "Bernard Julie", 2, 17.20, 5, 5, 5);
 
 
 INSERT INTO contenir(Id_Commande, Id_Stock_Medicament, total_achete, prix_achat) VALUES
-        (1, 1, 2, 5),
-        (2, 2, 1, 3),
-        (3, 3, 3, 7),
-        (4, 4, 1, 4),
-        (5, 5, 2, 17);
+    (1, 1, 2, 5),
+    (2, 2, 1, 3),
+    (3, 3, 3, 7),
+    (4, 4, 1, 4),
+    (5, 5, 2, 17);
