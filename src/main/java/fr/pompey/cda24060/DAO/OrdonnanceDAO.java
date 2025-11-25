@@ -27,8 +27,8 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
             stmt.setString(2, ordonnance.getNomMedecin());
             stmt.setString(3, ordonnance.getNomPatient());
             // Note: Id_Medecin et Id_Patient devront être passés séparément ou ajoutés à la classe Ordonnance
-            stmt.setInt(4, 1); // Valeur temporaire - à adapter selon votre logique
-            stmt.setInt(5, 1); // Valeur temporaire - à adapter selon votre logique
+            stmt.setInt(4, 1);
+            stmt.setInt(5, 1);
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {

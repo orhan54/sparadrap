@@ -335,7 +335,7 @@ public class registerPatient extends JFrame {
                 currentPatient.setNom(nom);
                 currentPatient.setPrenom(prenom);
                 currentPatient.setPatNumSecu(numSecu);
-                currentPatient.setPatDateNaissance(dateNaissance);
+                currentPatient.setPatDateNaissance(String.valueOf(dateNaissance));
 
                 Lieu lieu = currentPatient.getLieu();
                 lieu.setAdresse(adresse);

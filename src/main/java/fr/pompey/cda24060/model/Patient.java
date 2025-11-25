@@ -26,7 +26,7 @@ public class Patient extends Personne {
                    Medecin medecin) throws SaisieException {
         super(nom, prenom, lieu, mutuelle, medecin);
 
-        this.setPatDateNaissance(Date.valueOf(dateNaissance));
+        this.setPatDateNaissance(String.valueOf(Date.valueOf(dateNaissance)));
         this.numeroSecuriteSociale = generateNumSecu();
     }
 
@@ -41,7 +41,7 @@ public class Patient extends Personne {
 
         super(nom, prenom, lieu, mutuelle, medecin);
 
-        this.setPatDateNaissance(Date.valueOf(dateNaissance.toLocalDate()));
+        this.setPatDateNaissance(String.valueOf(Date.valueOf(dateNaissance.toLocalDate())));
         this.numeroSecuriteSociale = numeroSecu;
     }
 
@@ -86,8 +86,8 @@ public class Patient extends Personne {
      *
      * @return the date naissance
      */
-    public LocalDate getPatDateNaissance() {
-        return this.patDateNaissance.toLocalDate();
+    public Date getPatDateNaissance() {
+        return this.patDateNaissance;
     }
 
     /**
@@ -96,11 +96,11 @@ public class Patient extends Personne {
      * @param pDateNaissance the date naissance
      * @throws SaisieException the saisie exception
      */
-    public void setPatDateNaissance(Date pDateNaissance) throws SaisieException {
+    public void setPatDateNaissance(String pDateNaissance) throws SaisieException {
         if (pDateNaissance == null) {
             throw new SaisieException("Date de naissance invalide !");
         }
-        this.patDateNaissance = pDateNaissance;
+        this.patDateNaissance = Date.valueOf(pDateNaissance);
     }
 
     /**

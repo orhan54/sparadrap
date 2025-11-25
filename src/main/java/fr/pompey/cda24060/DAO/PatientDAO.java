@@ -7,6 +7,7 @@ import fr.pompey.cda24060.model.Mutuelle;
 import fr.pompey.cda24060.model.Medecin;
 
 import java.sql.*;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,7 @@ public class PatientDAO extends InterfaceDAO<Patient> {
             stmt.setString(1, patient.getNom());
             stmt.setString(2, patient.getPrenom());
             stmt.setString(3, patient.getPatNumeSecu());
-            stmt.setDate(4, Date.valueOf(patient.getPatDateNaissance()));
+            stmt.setDate(4, Date.valueOf(String.valueOf(patient.getPatDateNaissance())));
             stmt.setInt(5, patient.getLieu().getId_Lieu());
             stmt.setInt(6, patient.getMutuelle().getId_Mutuelle());
             stmt.setInt(7, patient.getMedecin().getId_Medecin());
@@ -104,7 +105,7 @@ public class PatientDAO extends InterfaceDAO<Patient> {
             ps.setString(1, patient.getNom());
             ps.setString(2, patient.getPrenom());
             ps.setString(3, patient.getPatNumeSecu());
-            ps.setDate(4, Date.valueOf(patient.getPatDateNaissance()));
+            ps.setDate(4, Date.valueOf(patient.getPatDateNaissance().toLocalDate()));
             ps.setInt(5, patient.getLieu().getId_Lieu());
             ps.setInt(6, patient.getMutuelle().getId_Mutuelle());
             if (patient.getMedecin() != null) {

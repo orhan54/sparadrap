@@ -2,8 +2,7 @@ package fr.pompey.cda24060.model;
 
 import fr.pompey.cda24060.exception.SaisieException;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,8 +15,7 @@ import static fr.pompey.cda24060.utility.RegexUtility.regexAlpha;
 public class Ordonnance {
     // Attributs pour la classe Ordonnance
     private int Id_Ordonnance;
-    private LocalDateTime dateOrdonnance;
-    private String date, nomMedecin, nomPatient;
+    private String ordoDate, nomMedecin, nomPatient;
 
     // Liste des médicaments pour cette ordonnance
     private List<Stock_Medicament> medicaments;
@@ -35,7 +33,7 @@ public class Ordonnance {
      * @throws SaisieException exception de saisie
      */
     public Ordonnance(String pOrdoDate, String pNomMedecin, String pNomPatient, List<Stock_Medicament> medicaments) throws SaisieException {
-        this.setDate(pOrdoDate);
+        this.setOrdoDate(pOrdoDate);
         //this.dateOrdonnance = LocalDateTime.now();  // *** mise en commentaire pour tester les differentes dates de initialisation ***
         this.setNomMedecin(pNomMedecin);
         this.setNomPatient(pNomPatient);
@@ -88,35 +86,16 @@ public class Ordonnance {
     }
 
     /**
-     * Gets date ordonnance.
-     *
-     * @return the date ordonnance
-     */
-    public LocalDateTime getDateOrdonnance() {
-        return this.dateOrdonnance;
-    }
-
-    /**
-     * Gets date ordonnance creation formatée.
-     *
-     * @return the date ordonnance creation formatter
-     */
-    public String getDateOrdonnanceCreation() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return dateOrdonnance.format(formatter);
-    }
-
-    /**
      * Sets date.
      *
-     * @param date the date
+     * @param pOrdoDate the p ordo date
      * @throws SaisieException the saisie exception
      */
-    public void setDate(String date) throws SaisieException {
-        if (!dateValide(date)) {
+    public void setOrdoDate(String pOrdoDate) throws SaisieException {
+        if (!dateValide(pOrdoDate)) {
             throw new SaisieException("Le date n'est pas valide.");
         }else{
-            this.date = date;
+            this.ordoDate = pOrdoDate;
         }
     }
 
@@ -126,7 +105,7 @@ public class Ordonnance {
      * @return the date
      */
     public String getDate() {
-        return this.date;
+        return this.ordoDate;
     }
 
     /**
@@ -179,7 +158,7 @@ public class Ordonnance {
     public String toString() {
         StringBuilder sbo = new StringBuilder();
         sbo.append("\nOrdonnance :\n");
-        sbo.append("- Date ordonnance : ").append(date).append("\n");
+        sbo.append("- Date ordonnance : ").append(ordoDate).append("\n");
         sbo.append("- Nom médecin : ").append(nomMedecin).append("\n");
         sbo.append("- Nom patient : ").append(nomPatient).append("\n");
         sbo.append("Liste des médicaments :\n");
