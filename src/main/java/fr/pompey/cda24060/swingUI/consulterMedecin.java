@@ -3,6 +3,8 @@ package fr.pompey.cda24060.swingUI;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import fr.pompey.cda24060.DAO.MedecinDAO;
+import fr.pompey.cda24060.DAO.PatientDAO;
+import fr.pompey.cda24060.DAO.OrdonnanceDAO;
 import fr.pompey.cda24060.model.Medecin;
 import fr.pompey.cda24060.model.Ordonnance;
 import fr.pompey.cda24060.model.Patient;
@@ -39,6 +41,8 @@ public class consulterMedecin extends JFrame {
     private String selectedValue;
     private JFrame previousFrame;
     private MedecinDAO medecinDAO;
+    private PatientDAO patientDAO;
+    private OrdonnanceDAO ordonnanceDAO;
 
     private DefaultTableModel tableModelMedecin;
 
@@ -55,9 +59,11 @@ public class consulterMedecin extends JFrame {
     public consulterMedecin(JFrame previousFrame) {
         this.previousFrame = previousFrame;
 
-        // Initialiser le DAO
+        // Initialiser les DAOs
         try {
             this.medecinDAO = new MedecinDAO();
+            this.patientDAO = new PatientDAO();
+            this.ordonnanceDAO = new OrdonnanceDAO();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this,
                     "Erreur de connexion à la base de données: " + e.getMessage(),
@@ -89,6 +95,9 @@ public class consulterMedecin extends JFrame {
 
         // Charger les médecins depuis la BDD
         chargerMedecinsDepuisBDD();
+
+        // Charger les patients depuis la BDD
+        chargerPatientsDepuisBDD();
 
         // Listeners
         remplirComboBox();
@@ -144,11 +153,37 @@ public class consulterMedecin extends JFrame {
     }
 
     /**
+     * Charge les patients depuis la base de données et met à jour la liste statique
+     */
+    private void chargerPatientsDepuisBDD() {
+        try {
+            if (patientDAO != null) {
+                List<Patient> patientsFromDB = patientDAO.getAll();
+
+                // Vider la liste statique
+                Patient.getPatients().clear();
+
+                // Ajouter tous les patients de la BDD
+                Patient.getPatients().addAll(patientsFromDB);
+
+                System.out.println("Chargement de " + patientsFromDB.size() + " patients depuis la BDD");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des patients: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Rafraîchit l'affichage du comboBox après une modification
      */
     public void rafraichirAffichage() {
         // Recharger depuis la BDD
         chargerMedecinsDepuisBDD();
+        chargerPatientsDepuisBDD();
 
         // Remplir à nouveau le comboBox
         remplirComboBox();
@@ -165,6 +200,8 @@ public class consulterMedecin extends JFrame {
 
         if (selectedInfo == 0 || selectedMedecin == null || selectedMedecin.equals("Choisir un médecin")) {
             titreFiltreInfo.setText("Choisir un filtre...");
+            // Vider le tableau
+            configureTable(new String[]{"Aucune donnée"});
             return;
         }
 
@@ -178,26 +215,49 @@ public class consulterMedecin extends JFrame {
         }
 
         if (selectedInfo == 1) {
-            // Patients du médecin
+            // Patients du médecin - CHARGER DEPUIS LA BDD
             titreFiltreInfo.setText("Liste des patients du médecin : " + selectedMedecin);
 
-            List<Patient> patientsMedecin = Patient.getPatients().stream()
-                    .filter(p -> p.getMedecin() != null && p.getMedecin().equals(medecinChoisi))
-                    .collect(Collectors.toList());
+            try {
+                // Filtrer les patients chargés depuis la BDD
+                List<Patient> patientsMedecin = Patient.getPatients().stream()
+                        .filter(p -> p.getMedecin() != null &&
+                                p.getMedecin().getId_Medecin() == medecinChoisi.getId_Medecin())
+                        .collect(Collectors.toList());
 
-            configureTable(HEADER_PATIENT);
-            constructDataTable(patientsMedecin);
+                configureTable(HEADER_PATIENT);
+                constructDataTable(patientsMedecin);
+
+                System.out.println("Affichage de " + patientsMedecin.size() + " patients pour le médecin " + selectedMedecin);
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                        "Erreur lors de l'affichage des patients: " + e.getMessage(),
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
 
         } else if (selectedInfo == 2) {
-            // Ordonnances du médecin
+            // Ordonnances du médecin - CHARGER DEPUIS LA BDD
             titreFiltreInfo.setText("Liste des ordonnances du médecin : " + selectedMedecin);
 
-            List<Ordonnance> ordonnancesMedecin = Ordonnance.getOrdonnances().stream()
-                    .filter(o -> o.getNomMedecin().equals(medecinChoisi.getNom() + " " + medecinChoisi.getPrenom()))
-                    .collect(Collectors.toList());
+            try {
+                // Charger les ordonnances depuis la BDD
+                List<Ordonnance> ordonnancesMedecin = ordonnanceDAO.getByNomMedecin(selectedMedecin);
 
-            configureTable(HEADER_ORDONNANCE);
-            constructDataTable(ordonnancesMedecin);
+                configureTable(HEADER_ORDONNANCE);
+                constructDataTable(ordonnancesMedecin);
+
+                System.out.println("Affichage de " + ordonnancesMedecin.size() + " ordonnances pour le médecin " + selectedMedecin);
+
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(this,
+                        "Erreur lors de l'affichage des ordonnances: " + e.getMessage(),
+                        "Erreur",
+                        JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
         }
     }
 
@@ -233,9 +293,11 @@ public class consulterMedecin extends JFrame {
             } else if (obj instanceof Ordonnance) {
                 Ordonnance o = (Ordonnance) obj;
 
-                String medicamentsStr = o.getMedicaments().stream()
-                        .map(m -> m.getMedicNom() + " (" + m.getQuantite() + ")")
-                        .collect(Collectors.joining(", "));
+                String medicamentsStr = o.getMedicaments().isEmpty() ?
+                        "Aucun médicament" :
+                        o.getMedicaments().stream()
+                                .map(m -> m.getMedicNom() + " (" + m.getQuantite() + ")")
+                                .collect(Collectors.joining(", "));
 
                 model.addRow(new Object[]{
                         o.getDate(),
@@ -279,6 +341,10 @@ public class consulterMedecin extends JFrame {
                         });
                     }
                 }
+
+                // Réinitialiser le filtre d'information
+                comboBoxInformation.setSelectedIndex(0);
+                titreFiltreInfo.setText("Choisir un filtre...");
             }
         });
     }
@@ -556,5 +622,4 @@ public class consulterMedecin extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
-
 }

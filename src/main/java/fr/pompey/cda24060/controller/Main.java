@@ -19,7 +19,6 @@ public class Main {
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
 
-
             SwingUtilities.invokeLater(() -> {
                 try {
                     Menu myMenu = new Menu();

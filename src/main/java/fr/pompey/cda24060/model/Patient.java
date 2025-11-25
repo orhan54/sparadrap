@@ -24,7 +24,6 @@ public class Patient extends Personne {
                    Lieu lieu,
                    Mutuelle mutuelle,
                    Medecin medecin) throws SaisieException {
-
         super(nom, prenom, lieu, mutuelle, medecin);
 
         this.setPatDateNaissance(Date.valueOf(dateNaissance));

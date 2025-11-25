@@ -2,6 +2,7 @@ package fr.pompey.cda24060.swingUI;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import fr.pompey.cda24060.DAO.Stock_MedicamentDAO;
 import fr.pompey.cda24060.model.Stock_Medicament;
 
 import javax.swing.*;
@@ -14,6 +15,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -28,11 +31,22 @@ public class addMedic extends JFrame {
     private JComboBox comboBoxDetailsMedic;
     private JTable tableDetailsMedic;
     private JFrame previousFrame;
+    private Stock_MedicamentDAO stock_medicamentDAO;
 
     private DefaultTableModel tableModel;
 
     public addMedic(JFrame previousFrame) {
         this.previousFrame = previousFrame;
+
+        // Initialiser la DAO
+        try {
+            this.stock_medicamentDAO = new Stock_MedicamentDAO();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de connexion à la base de données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
 
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
@@ -48,6 +62,9 @@ public class addMedic extends JFrame {
         String[] colonnes = {"Nom médicament", "Catégorie médicament", "Prix médicament", "Date mise en service", "Quantité médicament", "Date enregistrement stock"};
         tableModel = new DefaultTableModel(colonnes, 0);
         tableDetailsMedic.setModel(tableModel);
+
+        // charger les médicament depuis le stock
+        chargerStockMedicamentDepuisBDD();
 
         remplirComboBox();
 
@@ -76,10 +93,36 @@ public class addMedic extends JFrame {
         });
     }
 
+    private void chargerStockMedicamentDepuisBDD() {
+        try {
+            if (stock_medicamentDAO != null) {
+                List<Stock_Medicament> stockMedicamentsFromDB = stock_medicamentDAO.getAll();
+
+                // Vider la liste statique
+                Stock_Medicament.getMedicaments().clear();
+
+                // Ajouter tous les médicaments de la BDD
+                Stock_Medicament.getMedicaments().addAll(stockMedicamentsFromDB);
+
+                System.out.println("Chargement de " + stockMedicamentsFromDB.size() + " médicaments depuis la BDD");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des médicaments: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
     private void remplirComboBox() {
         comboBoxDetailsMedic.removeAllItems();
+
+        chargerStockMedicamentDepuisBDD();
+
         comboBoxDetailsMedic.addItem("Voir le détails d'un médicament");
         comboBoxDetailsMedic.setSelectedIndex(0);
+
 
         for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
             comboBoxDetailsMedic.addItem(medicament.getMedicNom());

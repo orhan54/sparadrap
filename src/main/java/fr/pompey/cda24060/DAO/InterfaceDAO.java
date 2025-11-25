@@ -1,6 +1,8 @@
 package fr.pompey.cda24060.DAO;
 
 import fr.pompey.cda24060.dataBase.Singleton;
+import fr.pompey.cda24060.exception.SaisieException;
+import fr.pompey.cda24060.model.Pharmacie;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -44,7 +46,7 @@ public abstract class InterfaceDAO<T> {
      * @return L'entité trouvée ou null
      * @throws SQLException
      */
-    public abstract T getById(int id) throws SQLException;
+    public abstract T getById(int id) throws SQLException, SaisieException;
 
     /**
      * Récupérer toutes les entités
@@ -67,7 +69,7 @@ public abstract class InterfaceDAO<T> {
      * @return true si la suppression a réussi
      * @throws SQLException
      */
-    public abstract boolean delete(int id) throws SQLException;
+    public abstract boolean delete(int id) throws SQLException, SaisieException;
 
     /**
      * Close connection.

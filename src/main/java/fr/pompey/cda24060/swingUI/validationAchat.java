@@ -249,11 +249,11 @@ public class validationAchat extends JFrame {
         // Si pas déjà présent, ajouter le médicament
         if (!dejaPresent) {
             Stock_Medicament medicamentCommande = new Stock_Medicament(
-                    0,
-                    medicamentTrouve.getDateMiseEnService(),
-                    medicamentTrouve.getMedicPrixUnitaire(),
                     medicamentTrouve.getMedicNom(),
-                    medicamentTrouve.getMedicDateEntreeStock()
+                    medicamentTrouve.getQuantite(),
+                    medicamentTrouve.getDateMiseEnService(),
+                    medicamentTrouve.getMedicDateEntreeStock(),
+                    medicamentTrouve.getMedicPrixUnitaire()
             );
             medicamentsCommande.add(medicamentCommande);
             quantitesMedicaments.add(quantite);
@@ -324,11 +324,11 @@ public class validationAchat extends JFrame {
             Stock_Medicament medOriginal = medicamentsCommande.get(i);
             int quantite = quantitesMedicaments.get(i);
             Stock_Medicament medAvecQte = new Stock_Medicament(
+                    medOriginal.getMedicNom(),
                     quantite,
                     medOriginal.getDateMiseEnService(),
-                    medOriginal.getMedicPrixUnitaire(),
-                    medOriginal.getMedicNom(),
-                    medOriginal.getMedicDateEntreeStock()
+                    medOriginal.getMedicDateEntreeStock(),
+                    medOriginal.getMedicPrixUnitaire()
             );
             medicamentsAvecQuantites.add(medAvecQte);
         }

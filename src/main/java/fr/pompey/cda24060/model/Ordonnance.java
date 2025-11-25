@@ -78,6 +78,14 @@ public class Ordonnance {
         return Id_Ordonnance;
     }
 
+    /**
+     * Sets id ordonnance.
+     *
+     * @param id_Ordonnance the id ordonnance
+     */
+    public void setId_Ordonnance(int id_Ordonnance) {
+        Id_Ordonnance = id_Ordonnance;
+    }
 
     /**
      * Gets date ordonnance.

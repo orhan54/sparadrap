@@ -71,6 +71,7 @@ public class MedecinDAO extends InterfaceDAO<Medecin> {
         } catch (SaisieException e) {
             throw new SQLException("Erreur lors de la récupération du médecin : " + e.getMessage());
         }
+
         return null;
     }
 
