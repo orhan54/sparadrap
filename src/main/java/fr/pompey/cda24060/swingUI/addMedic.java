@@ -59,7 +59,7 @@ public class addMedic extends JFrame {
         this.setResizable(false);
         this.setContentPane(contentPane);
 
-        String[] colonnes = {"Nom médicament", "Catégorie médicament", "Prix médicament", "Date mise en service", "Quantité médicament", "Date enregistrement stock"};
+        String[] colonnes = {"Nom médicament", "Catégorie médicament", "Quantité médicament", "Date mise en service", "Date enregistrement stock", "Prix médicament"};
         tableModel = new DefaultTableModel(colonnes, 0);
         tableDetailsMedic.setModel(tableModel);
 
@@ -142,10 +142,11 @@ public class addMedic extends JFrame {
                         if (m.getMedicNom().equals(comboBoxDetailsMedic.getSelectedItem())) {
                             tableModel.addRow(new Object[]{
                                     m.getMedicNom(),
-                                    m.getMedicPrixUnitaire() + "€",
-                                    m.getDateMiseEnService(),
+                                    m.getMedicCategorie(),
                                     m.getQuantite(),
-                                    m.getMedicDateEntreeStock()
+                                    m.getDateMiseEnService(),
+                                    m.getMedicDateEntreeStock(),
+                                    m.getMedicPrixUnitaire() + "€"
                             });
                         }
                     }
