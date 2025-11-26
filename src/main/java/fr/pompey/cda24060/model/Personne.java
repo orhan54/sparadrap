@@ -39,10 +39,22 @@ public abstract class Personne {
     }
 
     // Getters et Setters
+
+    /**
+     * Gets nom.
+     *
+     * @return the nom
+     */
     public String getNom() {
         return nom;
     }
 
+    /**
+     * Sets nom.
+     *
+     * @param pNom the p nom
+     * @throws SaisieException the saisie exception
+     */
     public void setNom(String pNom) throws SaisieException {
         if (pNom == null || !regexAlpha(pNom)) {
             throw new SaisieException("Erreur sur le nom : " + pNom);
@@ -50,10 +62,21 @@ public abstract class Personne {
         this.nom = pNom;
     }
 
+    /**
+     * Gets prenom.
+     *
+     * @return the prenom
+     */
     public String getPrenom() {
         return prenom;
     }
 
+    /**
+     * Sets prenom.
+     *
+     * @param pPrenom the p prenom
+     * @throws SaisieException the saisie exception
+     */
     public void setPrenom(String pPrenom) throws SaisieException {
         if (pPrenom == null || !regexAlpha(pPrenom)) {
             throw new SaisieException("Erreur sur le prénom : " + pPrenom);
@@ -61,26 +84,56 @@ public abstract class Personne {
         this.prenom = pPrenom;
     }
 
+    /**
+     * Gets lieu.
+     *
+     * @return the lieu
+     */
     public Lieu getLieu() {
         return lieu;
     }
 
+    /**
+     * Sets lieu.
+     *
+     * @param pLieu the p lieu
+     */
     public void setLieu(Lieu pLieu) {
         this.lieu = pLieu;
     }
 
+    /**
+     * Gets mutuelle.
+     *
+     * @return the mutuelle
+     */
     public Mutuelle getMutuelle() {
         return mutuelle;
     }
 
+    /**
+     * Sets mutuelle.
+     *
+     * @param pMutuelle the p mutuelle
+     */
     public void setMutuelle(Mutuelle pMutuelle) {
         this.mutuelle = pMutuelle;
     }
 
+    /**
+     * Gets medecin.
+     *
+     * @return the medecin
+     */
     public Medecin getMedecin() {
         return medecin;
     }
 
+    /**
+     * Sets medecin.
+     *
+     * @param pMedecin the p medecin
+     */
     public void setMedecin(Medecin pMedecin) {
         this.medecin = pMedecin;
     }

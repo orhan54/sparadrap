@@ -38,7 +38,6 @@ public class Mutuelle {
 
     // Getters et Setters
 
-
     /**
      * Gets id mutuelle.
      *

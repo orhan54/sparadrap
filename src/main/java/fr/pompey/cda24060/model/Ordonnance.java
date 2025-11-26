@@ -28,20 +28,38 @@ public class Ordonnance {
     }
 
     // Getters et Setters
+
+    /**
+     * Gets id ordonnance.
+     *
+     * @return the id ordonnance
+     */
     public int getId_Ordonnance() {
         return Id_Ordonnance;
     }
 
+    /**
+     * Sets id ordonnance.
+     *
+     * @param id_Ordonnance the id ordonnance
+     */
     public void setId_Ordonnance(int id_Ordonnance) {
         Id_Ordonnance = id_Ordonnance;
     }
 
+    /**
+     * Gets date.
+     *
+     * @return the date
+     */
     public Date getDate() {
         return date;
     }
 
     /**
      * Retourne la date formatée au format dd/MM/yyyy
+     *
+     * @return the date formatee
      */
     public String getDateFormatee() {
         if (this.date != null) {
@@ -50,50 +68,110 @@ public class Ordonnance {
         return "";
     }
 
+    /**
+     * Sets date.
+     *
+     * @param date the date
+     */
     public void setDate(Date date) {
         this.date = date;
     }
 
+    /**
+     * Gets nom medecin.
+     *
+     * @return the nom medecin
+     */
     public String getNomMedecin() {
         return nomMedecin;
     }
 
+    /**
+     * Sets nom medecin.
+     *
+     * @param nomMedecin the nom medecin
+     */
     public void setNomMedecin(String nomMedecin) {
         this.nomMedecin = nomMedecin;
     }
 
+    /**
+     * Gets nom patient.
+     *
+     * @return the nom patient
+     */
     public String getNomPatient() {
         return nomPatient;
     }
 
+    /**
+     * Sets nom patient.
+     *
+     * @param nomPatient the nom patient
+     */
     public void setNomPatient(String nomPatient) {
         this.nomPatient = nomPatient;
     }
 
+    /**
+     * Gets medecin.
+     *
+     * @return the medecin
+     */
     public Medecin getMedecin() {
         return medecin;
     }
 
+    /**
+     * Sets medecin.
+     *
+     * @param medecin the medecin
+     */
     public void setMedecin(Medecin medecin) {
         this.medecin = medecin;
     }
 
+    /**
+     * Gets patient.
+     *
+     * @return the patient
+     */
     public Patient getPatient() {
         return patient;
     }
 
+    /**
+     * Sets patient.
+     *
+     * @param patient the patient
+     */
     public void setPatient(Patient patient) {
         this.patient = patient;
     }
 
+    /**
+     * Gets medicaments.
+     *
+     * @return the medicaments
+     */
     public List<Stock_Medicament> getMedicaments() {
         return medicaments;
     }
 
+    /**
+     * Sets medicaments.
+     *
+     * @param medicaments the medicaments
+     */
     public void setMedicaments(List<Stock_Medicament> medicaments) {
         this.medicaments = medicaments;
     }
 
+    /**
+     * Ajouter medicament.
+     *
+     * @param medicament the medicament
+     */
     public void ajouterMedicament(Stock_Medicament medicament) {
         this.medicaments.add(medicament);
     }

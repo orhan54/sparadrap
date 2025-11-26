@@ -186,11 +186,20 @@ public class Commande {
     }
 
     /**
+     * Sets id commande.
+     *
+     * @param pId_Commande the p id commande
+     */
+    public void setId_Commande(int pId_Commande) {
+        Id_Commande = pId_Commande;
+    }
+
+    /**
      * Gets commandes.
      *
      * @return the commandes
      */
-    // Getters et setters
+// Getters et setters
     public static List<Commande> getCommandes() { return commandes; }
 
     /**
@@ -336,6 +345,12 @@ public class Commande {
      */
     public double getPrix() { return comPrix; }
 
+    /**
+     * Sets com prix.
+     *
+     * @param pComPrix the p com prix
+     * @throws SaisieException the saisie exception
+     */
     public void setComPrix(double pComPrix) throws SaisieException {
         if(pComPrix < 0){
             throw new SaisieException("Erreur sur le prix " + pComPrix);

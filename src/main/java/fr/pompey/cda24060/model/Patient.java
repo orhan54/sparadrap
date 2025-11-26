@@ -60,20 +60,38 @@ public class Patient extends Personne {
     }
 
     // Getters et Setters
+
+    /**
+     * Gets id patient.
+     *
+     * @return the id patient
+     */
     public int getId_Patient() {
         return Id_Patient;
     }
 
+    /**
+     * Sets id patient.
+     *
+     * @param id the id
+     */
     public void setId_Patient(int id) {
         this.Id_Patient = id;
     }
 
+    /**
+     * Gets pat date naissance.
+     *
+     * @return the pat date naissance
+     */
     public Date getPatDateNaissance() {
         return this.patDateNaissance;
     }
 
     /**
      * Gets date naissance formatée dd/MM/yyyy.
+     *
+     * @return the pat date naissance formatee
      */
     public String getPatDateNaissanceFormatee() {
         if (this.patDateNaissance != null) {
@@ -82,6 +100,12 @@ public class Patient extends Personne {
         return "";
     }
 
+    /**
+     * Sets pat date naissance.
+     *
+     * @param pDateNaissance the p date naissance
+     * @throws SaisieException the saisie exception
+     */
     public void setPatDateNaissance(Date pDateNaissance) throws SaisieException {
         if (pDateNaissance == null) {
             throw new SaisieException("Date de naissance invalide !");
@@ -91,6 +115,9 @@ public class Patient extends Personne {
 
     /**
      * Sets date naissance depuis format dd/MM/yyyy.
+     *
+     * @param dateString the date string
+     * @throws SaisieException the saisie exception
      */
     public void setPatDateNaissanceFromString(String dateString) throws SaisieException {
         try {
@@ -101,10 +128,21 @@ public class Patient extends Personne {
         }
     }
 
+    /**
+     * Gets pat nume secu.
+     *
+     * @return the pat nume secu
+     */
     public String getPatNumeSecu() {
         return numeroSecuriteSociale;
     }
 
+    /**
+     * Sets pat num secu.
+     *
+     * @param numero the numero
+     * @throws SaisieException the saisie exception
+     */
     public void setPatNumSecu(String numero) throws SaisieException {
         if (numero == null || numero.length() != 15) {
             throw new SaisieException("Numéro de sécurité sociale invalide : " + numero);
