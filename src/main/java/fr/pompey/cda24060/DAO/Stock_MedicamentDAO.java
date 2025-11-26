@@ -9,10 +9,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
+
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Override
     public Stock_Medicament create(Stock_Medicament Stock_Medicament) throws SQLException, IOException, ClassNotFoundException {
         String sql = "INSERT INTO Stock_Medicament(medic_nom, medic_categorie, medic_quantite, " +
@@ -33,7 +37,7 @@ public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
             stmt.setDouble(6, Stock_Medicament.getMedicPrixUnitaire());
             stmt.setInt(7, pharmacie.getId_Pharmacie());
 
-            int  affectedRows = stmt.executeUpdate();
+            int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
                 throw new SQLException("Échec de la création du stock médicament, aucune ligne affectée.");
             }
@@ -78,10 +82,9 @@ public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
         List<Stock_Medicament> stockMedicaments = new ArrayList<>();
         String sql = "SELECT stck.Id_Stock_Medicament, stck.medic_nom, stck.medic_categorie, " +
                 "stck.medic_quantite, stck.medic_date_mise_en_service, stck.medic_date_entree_stock, " +
-                "stck.medic_prix_unitaire,p.Id_Pharmacie, p.pha_nom, p.pha_prenom " +
+                "stck.medic_prix_unitaire, p.Id_Pharmacie, p.pha_nom, p.pha_prenom " +
                 "FROM Stock_Medicament AS stck " +
                 "INNER JOIN Pharmacie AS p ON p.Id_Pharmacie = stck.Id_Pharmacie";
-
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ResultSet rs = stmt.executeQuery();
@@ -114,6 +117,7 @@ public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
             stmt.setDate(4, Stock_Medicament.getDateMiseEnService());
             stmt.setDate(5, Stock_Medicament.getMedicDateEntreeStock());
             stmt.setDouble(6, Stock_Medicament.getMedicPrixUnitaire());
+            stmt.setInt(7, Stock_Medicament.getId_Stock_Medicament());
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
@@ -129,11 +133,11 @@ public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
         }
 
         // Supprimer le medicament dans le stock
-        String sql =  "DELETE FROM Stock_Medicament WHERE Id_Stock_Medicament = ?";
+        String sql = "DELETE FROM Stock_Medicament WHERE Id_Stock_Medicament = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
-            if(affectedRows == 0) return false;
+            if (affectedRows == 0) return false;
         }
 
         return true;

@@ -2,16 +2,14 @@ package fr.pompey.cda24060.DAO;
 
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Ordonnance;
+import fr.pompey.cda24060.model.Medecin;
+import fr.pompey.cda24060.model.Patient;
 import fr.pompey.cda24060.model.Stock_Medicament;
 
 import java.sql.*;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * DAO pour la gestion des ordonnances
- */
 public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
 
     @Override
@@ -19,16 +17,11 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
         String sql = "INSERT INTO Ordonnance (ordo_date, ordo_nom_medecin, ordo_nom_patient, Id_Medecin, Id_Patient) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            // Convertir la date String en Date SQL
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            java.time.LocalDate localDate = java.time.LocalDate.parse(ordonnance.getDate(), formatter);
-
-            stmt.setDate(1, Date.valueOf(localDate));
+            stmt.setDate(1, ordonnance.getDate());
             stmt.setString(2, ordonnance.getNomMedecin());
             stmt.setString(3, ordonnance.getNomPatient());
-            // Note: Id_Medecin et Id_Patient devront être passés séparément ou ajoutés à la classe Ordonnance
-            stmt.setInt(4, 1);
-            stmt.setInt(5, 1);
+            stmt.setInt(4, ordonnance.getMedecin().getId_Medecin());
+            stmt.setInt(5, ordonnance.getPatient().getId_Patient());
 
             int affectedRows = stmt.executeUpdate();
             if (affectedRows == 0) {
@@ -48,9 +41,11 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
     }
 
     @Override
-    public Ordonnance getById(int id) throws SQLException {
-        String sql = "SELECT o.Id_Ordonnance, o.ordo_date, o.ordo_nom_medecin, o.ordo_nom_patient " +
-                "FROM Ordonnance AS o " +
+    public Ordonnance getById(int id) throws SQLException, SaisieException {
+        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
+                "FROM Ordonnance o " +
+                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
+                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient " +
                 "WHERE o.Id_Ordonnance = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -60,8 +55,6 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
                     return extractOrdonnanceFromResultSet(rs);
                 }
             }
-        } catch (SaisieException e) {
-            throw new SQLException("Erreur lors de la récupération de l'ordonnance : " + e.getMessage());
         }
         return null;
     }
@@ -69,9 +62,10 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
     @Override
     public List<Ordonnance> getAll() throws SQLException {
         List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.Id_Ordonnance, o.ordo_date, o.ordo_nom_medecin, o.ordo_nom_patient " +
-                "FROM Ordonnance AS o " +
-                "ORDER BY o.ordo_date DESC";
+        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
+                "FROM Ordonnance o " +
+                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
+                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient";
 
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -82,22 +76,19 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
         } catch (SaisieException e) {
             throw new SQLException("Erreur lors de la récupération des ordonnances : " + e.getMessage());
         }
-
         return ordonnances;
     }
 
     /**
-     * Récupérer toutes les ordonnances d'un médecin spécifique par son nom
-     * @param nomMedecin Le nom complet du médecin (format: "Nom Prénom")
-     * @return Liste des ordonnances du médecin
-     * @throws SQLException
+     * Récupère les ordonnances par nom de médecin
      */
     public List<Ordonnance> getByNomMedecin(String nomMedecin) throws SQLException {
         List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.Id_Ordonnance, o.ordo_date, o.ordo_nom_medecin, o.ordo_nom_patient " +
-                "FROM Ordonnance AS o " +
-                "WHERE o.ordo_nom_medecin = ? " +
-                "ORDER BY o.ordo_date DESC";
+        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
+                "FROM Ordonnance o " +
+                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
+                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient " +
+                "WHERE o.ordo_nom_medecin = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, nomMedecin);
@@ -107,79 +98,23 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
                 }
             }
         } catch (SaisieException e) {
-            throw new SQLException("Erreur lors de la récupération des ordonnances du médecin : " + e.getMessage());
+            throw new SQLException("Erreur lors de la récupération des ordonnances : " + e.getMessage());
         }
-
-        return ordonnances;
-    }
-
-    /**
-     * Récupérer toutes les ordonnances d'un patient spécifique par son nom
-     * @param nomPatient Le nom complet du patient (format: "Nom Prénom")
-     * @return Liste des ordonnances du patient
-     * @throws SQLException
-     */
-    public List<Ordonnance> getByNomPatient(String nomPatient) throws SQLException {
-        List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.Id_Ordonnance, o.ordo_date, o.ordo_nom_medecin, o.ordo_nom_patient " +
-                "FROM Ordonnance AS o " +
-                "WHERE o.ordo_nom_patient = ? " +
-                "ORDER BY o.ordo_date DESC";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, nomPatient);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    ordonnances.add(extractOrdonnanceFromResultSet(rs));
-                }
-            }
-        } catch (SaisieException e) {
-            throw new SQLException("Erreur lors de la récupération des ordonnances du patient : " + e.getMessage());
-        }
-
-        return ordonnances;
-    }
-
-    /**
-     * Récupérer toutes les ordonnances d'un médecin par son ID
-     * @param idMedecin L'identifiant du médecin
-     * @return Liste des ordonnances du médecin
-     * @throws SQLException
-     */
-    public List<Ordonnance> getByMedecinId(int idMedecin) throws SQLException {
-        List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.Id_Ordonnance, o.ordo_date, o.ordo_nom_medecin, o.ordo_nom_patient " +
-                "FROM Ordonnance AS o " +
-                "WHERE o.Id_Medecin = ? " +
-                "ORDER BY o.ordo_date DESC";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, idMedecin);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    ordonnances.add(extractOrdonnanceFromResultSet(rs));
-                }
-            }
-        } catch (SaisieException e) {
-            throw new SQLException("Erreur lors de la récupération des ordonnances du médecin : " + e.getMessage());
-        }
-
         return ordonnances;
     }
 
     @Override
     public boolean update(Ordonnance ordonnance) throws SQLException {
-        String sql = "UPDATE Ordonnance SET ordo_date = ?, ordo_nom_medecin = ?, ordo_nom_patient = ? WHERE Id_Ordonnance = ?";
+        String sql = "UPDATE Ordonnance SET ordo_date = ?, ordo_nom_medecin = ?, ordo_nom_patient = ?, " +
+                "Id_Medecin = ?, Id_Patient = ? WHERE Id_Ordonnance = ?";
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            // Convertir la date String en Date SQL
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            java.time.LocalDate localDate = java.time.LocalDate.parse(ordonnance.getDate(), formatter);
-
-            stmt.setDate(1, Date.valueOf(localDate));
+            stmt.setDate(1, ordonnance.getDate());
             stmt.setString(2, ordonnance.getNomMedecin());
             stmt.setString(3, ordonnance.getNomPatient());
-            stmt.setInt(4, ordonnance.getId_Ordonnance());
+            stmt.setInt(4, ordonnance.getMedecin().getId_Medecin());
+            stmt.setInt(5, ordonnance.getPatient().getId_Patient());
+            stmt.setInt(6, ordonnance.getId_Ordonnance());
 
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
@@ -189,7 +124,6 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
     @Override
     public boolean delete(int id) throws SQLException {
         String sql = "DELETE FROM Ordonnance WHERE Id_Ordonnance = ?";
-
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
@@ -198,26 +132,69 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
     }
 
     /**
-     * Extraire un objet Ordonnance depuis un ResultSet
+     * Extrait une ordonnance depuis un ResultSet
      */
     private Ordonnance extractOrdonnanceFromResultSet(ResultSet rs) throws SQLException, SaisieException {
-        // Convertir la date SQL en String au format dd/MM/yyyy
-        Date sqlDate = rs.getDate("ordo_date");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        String dateStr = sqlDate.toLocalDate().format(formatter);
+        // Créer un médecin basique (vous pouvez enrichir avec LieuDAO si nécessaire)
+        Medecin medecin = new Medecin();
+        medecin.setId_Medecin(rs.getInt("Id_Medecin"));
+        medecin.setNom(rs.getString("med_nom"));
+        medecin.setPrenom(rs.getString("med_prenom"));
 
-        // Créer l'ordonnance avec une liste de médicaments vide
-        // Les médicaments devront être chargés séparément si nécessaire
+        // Créer un patient basique
+        Patient patient = new Patient();
+        patient.setId_Patient(rs.getInt("Id_Patient"));
+        patient.setNom(rs.getString("pat_nom"));
+        patient.setPrenom(rs.getString("pat_prenom"));
+
+        // Créer l'ordonnance avec java.sql.Date
         Ordonnance ordonnance = new Ordonnance(
-                dateStr,
+                rs.getDate("ordo_date"), // java.sql.Date directement du ResultSet
                 rs.getString("ordo_nom_medecin"),
                 rs.getString("ordo_nom_patient"),
-                new ArrayList<Stock_Medicament>()
+                medecin,
+                patient
         );
-
         ordonnance.setId_Ordonnance(rs.getInt("Id_Ordonnance"));
 
+        // Charger les médicaments associés à cette ordonnance si nécessaire
+        // ordonnance.setMedicaments(getMedicamentsByOrdonnance(ordonnance.getId_Ordonnance()));
+
         return ordonnance;
+    }
+
+    /**
+     * Récupère les médicaments d'une ordonnance (optionnel, si vous avez une table de liaison)
+     */
+    public List<Stock_Medicament> getMedicamentsByOrdonnance(int idOrdonnance) throws SQLException {
+        List<Stock_Medicament> medicaments = new ArrayList<>();
+
+        // Si vous avez une table de liaison ordonnance_medicament
+        String sql = "SELECT sm.* FROM Stock_Medicament sm " +
+                "INNER JOIN ordonnance_medicament om ON sm.Id_Stock_Medicament = om.Id_Stock_Medicament " +
+                "WHERE om.Id_Ordonnance = ?";
+
+        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+            stmt.setInt(1, idOrdonnance);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Créer un médicament basique
+                    Stock_Medicament medicament = new Stock_Medicament(
+                            rs.getString("medic_nom"),
+                            rs.getInt("medic_quantite"),
+                            rs.getDate("medic_date_mise_en_service"),
+                            rs.getDate("medic_date_entree_stock"),
+                            rs.getDouble("medic_prix_unitaire")
+                    );
+                    medicament.setId_Stock_Medicament(rs.getInt("Id_Stock_Medicament"));
+                    medicaments.add(medicament);
+                }
+            }
+        } catch (SaisieException e) {
+            throw new SQLException("Erreur lors de la récupération des médicaments : " + e.getMessage());
+        }
+
+        return medicaments;
     }
 
     @Override

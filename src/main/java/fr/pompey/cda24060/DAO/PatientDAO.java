@@ -13,6 +13,8 @@ import java.util.List;
 
 public class PatientDAO extends InterfaceDAO<Patient> {
 
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
     @Override
     public Patient create(Patient patient) throws SQLException {
         String sql = "INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES (?, ?, ?, ?, ?, ?, ?)";
@@ -74,7 +76,7 @@ public class PatientDAO extends InterfaceDAO<Patient> {
     @Override
     public List<Patient> getAll() throws SQLException {
         List<Patient> patients = new ArrayList<>();
-        String sql = "SELECT p.*, l.*, mut.*, m.*" +
+        String sql = "SELECT p.*, l.*, mut.*, m.* " +
                 "FROM Patient AS p " +
                 "JOIN Lieu AS l ON p.Id_Lieu = l.Id_Lieu " +
                 "JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle " +
@@ -231,5 +233,4 @@ public class PatientDAO extends InterfaceDAO<Patient> {
     public void closeConnection() throws SQLException {
         super.closeConnection();
     }
-
 }

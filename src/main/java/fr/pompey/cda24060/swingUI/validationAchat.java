@@ -4,6 +4,8 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import fr.pompey.cda24060.DAO.MedecinDAO;
 import fr.pompey.cda24060.DAO.PatientDAO;
+import fr.pompey.cda24060.DAO.Stock_MedicamentDAO;
+import fr.pompey.cda24060.DAO.MutuelleDAO;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.*;
 import javax.swing.*;
@@ -15,6 +17,7 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Date;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -48,8 +51,32 @@ public class validationAchat extends JFrame {
     private List<Stock_Medicament> medicamentsCommande = new ArrayList<>();
     private List<Integer> quantitesMedicaments = new ArrayList<>();
 
+    // DAOs et listes locales
+    private MedecinDAO medecinDAO;
+    private PatientDAO patientDAO;
+    private Stock_MedicamentDAO stockMedicamentDAO;
+    private MutuelleDAO mutuelleDAO;
+    private List<Medecin> medecinsList;
+    private List<Patient> patientsList;
+    private List<Stock_Medicament> stockMedicamentsList;
+    private List<Mutuelle> mutuellesList;
+
     public validationAchat(String typeAchat, JFrame previousFrame) {
         this.previousFrame = previousFrame;
+
+        // Initialiser les DAOs
+        try {
+            this.medecinDAO = new MedecinDAO();
+            this.patientDAO = new PatientDAO();
+            this.stockMedicamentDAO = new Stock_MedicamentDAO();
+            this.mutuelleDAO = new MutuelleDAO();
+            chargerDonneesDepuisBDD();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de connexion à la base de données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
 
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
@@ -59,7 +86,9 @@ public class validationAchat extends JFrame {
         this.setPreferredSize(dimension);
         this.setResizable(false);
         this.setContentPane(contentPane);
+
         initializeNewComponents();
+
         // Afficher le type d'achat
         if (typeAchat.equalsIgnoreCase("direct")) {
             titreTypeLabel.setText("DIRECT");
@@ -67,24 +96,29 @@ public class validationAchat extends JFrame {
         } else if (typeAchat.equalsIgnoreCase("ordonnance")) {
             titreTypeLabel.setText("ORDONNANCE");
             setMutuelleComponentsVisible(true);
-            checkBoxMutuelle.setSelected(true); // auto-activer mutuelle pour ordonnance
+            checkBoxMutuelle.setSelected(true);
         }
+
         // Tableaux pour les medicaments disponibles
-        String[] colonne = {"Quantité", "Date mise en service", "Prix", "Categorie", "Nom"};
+        String[] colonne = {"Quantité", "Date mise en service", "Prix", "Nom"};
         tableModelMedicDispo = new DefaultTableModel(colonne, 0);
         tableMedicDispo.setModel(tableModelMedicDispo);
+
         // Tableaux pour passer la commande des médicaments
         String[] colonnes = {"Nom medicament", "Quantite", "Prix unitaire", "Prix total"};
         tableModelCommande = new DefaultTableModel(colonnes, 0);
         tableMedic.setModel(tableModelCommande);
+
         afficherListeMedicDispo();
         remplirComboBoxMedecin();
         remplirComboBoxClient();
         remplirComboBoxMedicament();
         remplirComboBoxMutuelle();
+
         this.pack();
         this.setLocationRelativeTo(null);
         btnValiderAchat.setEnabled(false);
+
         // Gestionnaire pour la croix (X)
         this.addWindowListener(new WindowAdapter() {
             @Override
@@ -92,6 +126,7 @@ public class validationAchat extends JFrame {
                 retour();
             }
         });
+
         // Listeners
         btnRetourAchat.addActionListener(e -> retour());
         btnValiderAchat.addActionListener(e -> {
@@ -112,11 +147,42 @@ public class validationAchat extends JFrame {
             }
         });
         btnDelete.addActionListener(e -> supprimerMedicamentDuPanier());
+
         // Mutuelle
         checkBoxMutuelle.addActionListener(e -> mettreAJourAffichagePrix());
         comboBoxMutuelle.addActionListener(e -> mettreAJourAffichagePrix());
-        // Met à jour le prix initial
+
         mettreAJourAffichagePrix();
+    }
+
+    /**
+     * Charge toutes les données depuis la BDD
+     */
+    private void chargerDonneesDepuisBDD() {
+        try {
+            if (medecinDAO != null) {
+                medecinsList = medecinDAO.getAll();
+                System.out.println("Chargement de " + medecinsList.size() + " médecins");
+            }
+            if (patientDAO != null) {
+                patientsList = patientDAO.getAll();
+                System.out.println("Chargement de " + patientsList.size() + " patients");
+            }
+            if (stockMedicamentDAO != null) {
+                stockMedicamentsList = stockMedicamentDAO.getAll();
+                System.out.println("Chargement de " + stockMedicamentsList.size() + " médicaments");
+            }
+            if (mutuelleDAO != null) {
+                mutuellesList = mutuelleDAO.getAll();
+                System.out.println("Chargement de " + mutuellesList.size() + " mutuelles");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
     }
 
     private void initializeNewComponents() {
@@ -140,9 +206,12 @@ public class validationAchat extends JFrame {
     private void remplirComboBoxMutuelle() {
         comboBoxMutuelle.removeAllItems();
         comboBoxMutuelle.addItem("-- Sélectionner une mutuelle --");
-        for (Mutuelle mutuelle : Mutuelle.getMutuelles()) {
-            String item = mutuelle.getNom() + " (" + String.format("%.1f", mutuelle.getTauxPriseEnCharge()) + "%)";
-            comboBoxMutuelle.addItem(item);
+
+        if (mutuellesList != null) {
+            for (Mutuelle mutuelle : mutuellesList) {
+                String item = mutuelle.getNom() + " (" + mutuelle.getTauxPriseEnCharge() + "%)";
+                comboBoxMutuelle.addItem(item);
+            }
         }
     }
 
@@ -151,12 +220,13 @@ public class validationAchat extends JFrame {
         double deduction = 0.0;
         double prixAPayer = prixTotal;
         String tauxText = "Taux : 0%";
-        // Réduction mutuelle 30% si ordonnance
+
         if ("ORDONNANCE".equalsIgnoreCase(titreTypeLabel.getText()) && checkBoxMutuelle.isSelected()) {
             deduction = prixTotal * 0.30;
             prixAPayer = prixTotal - deduction;
             tauxText = "Taux : 30%";
         }
+
         labelPrixTotal.setText(String.format("Prix total : %.2f€", prixTotal));
         labelDeductionMutuelle.setText(String.format("Déduction mutuelle : %.2f€", deduction));
         labelPrixAPayer.setText(String.format("Prix à payer : %.2f€", prixAPayer));
@@ -174,28 +244,38 @@ public class validationAchat extends JFrame {
 
     private void remplirComboBoxMedecin() {
         comboBoxMedecin.removeAllItems();
-        for (Medecin medecin : Medecin.getMedecins()) {
-            comboBoxMedecin.addItem(medecin.getNom() + " " + medecin.getPrenom());
+
+        if (medecinsList != null) {
+            for (Medecin medecin : medecinsList) {
+                comboBoxMedecin.addItem(medecin.getNom() + " " + medecin.getPrenom());
+            }
         }
     }
 
     private void remplirComboBoxClient() {
         comboBoxPatient.removeAllItems();
-        for (Patient patient : Patient.getPatients()) {
-            comboBoxPatient.addItem(patient.getNom() + " " + patient.getPrenom());
+
+        if (patientsList != null) {
+            for (Patient patient : patientsList) {
+                comboBoxPatient.addItem(patient.getNom() + " " + patient.getPrenom());
+            }
         }
     }
 
     private void remplirComboBoxMedicament() {
         comboBoxMedicament.removeAllItems();
-        for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
-            comboBoxMedicament.addItem(medicament.getMedicNom());
+
+        if (stockMedicamentsList != null) {
+            for (Stock_Medicament medicament : stockMedicamentsList) {
+                comboBoxMedicament.addItem(medicament.getMedicNom());
+            }
         }
     }
 
     private void ajouterMedicamentAuPanier() throws SaisieException {
         String nomMedic = comboBoxMedicament.getSelectedItem().toString().trim();
         int quantite;
+
         try {
             quantite = Integer.parseInt(inputQuantiteMedic.getText().trim());
             if (quantite <= 0) throw new NumberFormatException();
@@ -205,10 +285,12 @@ public class validationAchat extends JFrame {
         }
 
         Stock_Medicament medicamentTrouve = null;
-        for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
-            if (medicament.getMedicNom().equalsIgnoreCase(nomMedic)) {
-                medicamentTrouve = medicament;
-                break;
+        if (stockMedicamentsList != null) {
+            for (Stock_Medicament medicament : stockMedicamentsList) {
+                if (medicament.getMedicNom().equalsIgnoreCase(nomMedic)) {
+                    medicamentTrouve = medicament;
+                    break;
+                }
             }
         }
 
@@ -217,7 +299,6 @@ public class validationAchat extends JFrame {
             return;
         }
 
-        // Vérifier si la quantité demandée est disponible
         if (medicamentTrouve.getQuantite() < quantite) {
             JOptionPane.showMessageDialog(this,
                     "Quantité insuffisante en stock !\n" +
@@ -226,13 +307,11 @@ public class validationAchat extends JFrame {
             return;
         }
 
-        // Vérifier si le médicament est déjà dans le panier
         boolean dejaPresent = false;
         for (int i = 0; i < medicamentsCommande.size(); i++) {
             if (medicamentsCommande.get(i).getMedicNom().equalsIgnoreCase(nomMedic)) {
-                // Mettre à jour la quantité
                 int nouvelleQuantite = quantitesMedicaments.get(i) + quantite;
-                // Vérifier si la nouvelle quantité est disponible
+
                 if (medicamentTrouve.getQuantite() < nouvelleQuantite) {
                     JOptionPane.showMessageDialog(this,
                             "Quantité totale insuffisante en stock !\n" +
@@ -246,7 +325,6 @@ public class validationAchat extends JFrame {
             }
         }
 
-        // Si pas déjà présent, ajouter le médicament
         if (!dejaPresent) {
             Stock_Medicament medicamentCommande = new Stock_Medicament(
                     medicamentTrouve.getMedicNom(),
@@ -281,12 +359,16 @@ public class validationAchat extends JFrame {
             Stock_Medicament medCommande = medicamentsCommande.get(i);
             int quantiteCommande = quantitesMedicaments.get(i);
             Stock_Medicament medStock = null;
-            for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
-                if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
-                    medStock = medicament;
-                    break;
+
+            if (stockMedicamentsList != null) {
+                for (Stock_Medicament medicament : stockMedicamentsList) {
+                    if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
+                        medStock = medicament;
+                        break;
+                    }
                 }
             }
+
             if (medStock == null || medStock.getQuantite() < quantiteCommande) {
                 JOptionPane.showMessageDialog(this,
                         "Quantité insuffisante pour " + medCommande.getMedicNom() + "\n" +
@@ -300,10 +382,14 @@ public class validationAchat extends JFrame {
         for (int i = 0; i < medicamentsCommande.size(); i++) {
             Stock_Medicament medCommande = medicamentsCommande.get(i);
             int quantiteCommande = quantitesMedicaments.get(i);
-            for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
-                if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
-                    medicament.setMedicQuantite(medicament.getQuantite() - quantiteCommande);
-                    break;
+
+            if (stockMedicamentsList != null) {
+                for (Stock_Medicament medicament : stockMedicamentsList) {
+                    if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
+                        medicament.setMedicQuantite(medicament.getQuantite() - quantiteCommande);
+                        // TODO: Mettre à jour en BDD avec stockMedicamentDAO.update(medicament)
+                        break;
+                    }
                 }
             }
         }
@@ -313,6 +399,7 @@ public class validationAchat extends JFrame {
         double deduction = 0.0;
         double prixAPayer = prixTotal;
         boolean priseEnCharge = false;
+
         if ("ORDONNANCE".equalsIgnoreCase(titreTypeLabel.getText()) && checkBoxMutuelle.isSelected()) {
             deduction = prixTotal * 0.30;
             prixAPayer = prixTotal - deduction;
@@ -337,6 +424,7 @@ public class validationAchat extends JFrame {
                 ? Commande.TypeAchat.DIRECT
                 : Commande.TypeAchat.ORDONNANCE;
         int quantiteTotale = quantitesMedicaments.stream().mapToInt(Integer::intValue).sum();
+
         Commande commande = new Commande(
                 new Date(System.currentTimeMillis()),
                 typeAchat,
@@ -355,7 +443,9 @@ public class validationAchat extends JFrame {
             message += "Prise en charge mutuelle : 30%\n";
         }
         message += "Prix à payer : " + String.format("%.2f€", prixAPayer);
+
         JOptionPane.showMessageDialog(this, message, "Succès", JOptionPane.INFORMATION_MESSAGE);
+
         Menu menu = new Menu();
         menu.setVisible(true);
         this.dispose();
@@ -378,15 +468,16 @@ public class validationAchat extends JFrame {
 
     private void afficherListeMedicDispo() {
         tableModelMedicDispo.setRowCount(0);
-        if (Stock_Medicament.getMedicaments().isEmpty()) {
-            tableModelMedicDispo.addRow(new Object[]{"-", "Aucun medicament", "", "", ""});
+
+        if (stockMedicamentsList == null || stockMedicamentsList.isEmpty()) {
+            tableModelMedicDispo.addRow(new Object[]{"-", "Aucun medicament", "", ""});
         } else {
-            for (Stock_Medicament medicaments : Stock_Medicament.getMedicaments()) {
+            for (Stock_Medicament medicament : stockMedicamentsList) {
                 tableModelMedicDispo.addRow(new Object[]{
-                        medicaments.getQuantite(),
-                        medicaments.getDateMiseEnService(),
-                        String.format("%.2f€", medicaments.getMedicPrixUnitaire()),
-                        medicaments.getMedicNom(),
+                        medicament.getQuantite(),
+                        medicament.getDateMiseEnServiceFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                        String.format("%.2f€", medicament.getMedicPrixUnitaire()),
+                        medicament.getMedicNom()
                 });
             }
         }
@@ -651,4 +742,6 @@ public class validationAchat extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
+    // Gardez votre méthode $$$setupUI$$$ existante ici
 }

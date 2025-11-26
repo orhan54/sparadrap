@@ -2,6 +2,8 @@ package fr.pompey.cda24060.swingUI;
 
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
+import fr.pompey.cda24060.DAO.MedecinDAO;
+import fr.pompey.cda24060.DAO.OrdonnanceDAO;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Medecin;
 import fr.pompey.cda24060.model.Ordonnance;
@@ -16,10 +18,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 
 public class historiqueOrdonnance extends JFrame {
     private JPanel contentPane;
@@ -30,27 +33,44 @@ public class historiqueOrdonnance extends JFrame {
     private JButton quitterButton;
     private String selectedMedecin;
     private JFrame previousFrame;
+    private MedecinDAO medecinDAO;
+    private OrdonnanceDAO ordonnanceDAO;
+    private List<Medecin> medecinsList;
+    private List<Ordonnance> ordonnancesList;
 
     private DefaultTableModel tableModelOrdo;
 
-    public historiqueOrdonnance(JFrame previousFrame) throws SaisieException {
+    public historiqueOrdonnance(JFrame previousFrame) {
         this.previousFrame = previousFrame;
+
+        // Initialiser les DAOs
+        try {
+            this.medecinDAO = new MedecinDAO();
+            this.ordonnanceDAO = new OrdonnanceDAO();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur de connexion à la base de données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+        }
 
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
 
-        this.setTitle("Sparadrap - Historique des Achats");
+        this.setTitle("Sparadrap - Historique des Ordonnances");
         this.setIconImage(imageIcon.getImage());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         this.setPreferredSize(dimension);
         this.setResizable(false);
         this.setContentPane(contentPane);
 
-        remplirComboBox();
-
         String[] colonnes = {"Date", "Nom du médecin", "Nom du patient", "Liste des médicaments"};
         tableModelOrdo = new DefaultTableModel(colonnes, 0);
         tableOrdo.setModel(tableModelOrdo);
+
+        // Charger les données depuis la BDD
+        chargerDonneesDepuisBDD();
+        remplirComboBox();
 
         this.pack();
         this.setLocationRelativeTo(null);
@@ -63,27 +83,41 @@ public class historiqueOrdonnance extends JFrame {
             }
         });
 
-        retourButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                retour();
-            }
-        });
-        quitterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                quitter();
-            }
-        });
+        retourButton.addActionListener(e -> retour());
+        quitterButton.addActionListener(e -> quitter());
     }
 
-    private void remplirComboBox() throws SaisieException {
+    /**
+     * Charge les médecins et ordonnances depuis la BDD
+     */
+    private void chargerDonneesDepuisBDD() {
+        try {
+            if (medecinDAO != null) {
+                medecinsList = medecinDAO.getAll();
+                System.out.println("Chargement de " + medecinsList.size() + " médecins depuis la BDD");
+            }
+            if (ordonnanceDAO != null) {
+                ordonnancesList = ordonnanceDAO.getAll();
+                System.out.println("Chargement de " + ordonnancesList.size() + " ordonnances depuis la BDD");
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this,
+                    "Erreur lors du chargement des données: " + e.getMessage(),
+                    "Erreur",
+                    JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
+    private void remplirComboBox() {
         comboBoxOrdoMedecin.removeAllItems();
         comboBoxOrdoMedecin.addItem("Choisir le médecin");
-        comboBoxOrdoMedecin.setSelectedItem(0);
+        comboBoxOrdoMedecin.setSelectedIndex(0);
 
-        for (Medecin m : Medecin.getMedecins()) {
-            comboBoxOrdoMedecin.addItem(m.getNom() + " " + m.getPrenom());
+        if (medecinsList != null) {
+            for (Medecin m : medecinsList) {
+                comboBoxOrdoMedecin.addItem(m.getNom() + " " + m.getPrenom());
+            }
         }
 
         comboBoxOrdoMedecin.addActionListener(new ActionListener() {
@@ -93,38 +127,64 @@ public class historiqueOrdonnance extends JFrame {
                 selectedMedecin = selected;
                 tableModelOrdo.setRowCount(0);
 
-                for (Ordonnance ordo : Ordonnance.getOrdonnances()) {
-                    if (selectedMedecin.equals(ordo.getNomMedecin())) {
-
-                        String medicamentStr = ordo.getMedicaments().stream()
-                                .map(m -> m.getMedicNom())
-                                .collect(Collectors.joining(", "));
-                        // System.out.println(medicamentStr);
-
-                        tableModelOrdo.addRow(new Object[]{
-                                ordo.getDate(),
-                                ordo.getNomMedecin(),
-                                ordo.getNomPatient(),
-                                medicamentStr // nom et quantités
-                        });
-
-                    } else if (false) {
-                        System.out.println("Le médecin " + ordo.getNomMedecin() + " n'a pas encore d'ordonnance !");
-                    }
+                if (selected != null && !selected.equals("Choisir le médecin")) {
+                    afficherOrdonnancesMedecin(selected);
                 }
             }
         });
     }
 
+    /**
+     * Affiche les ordonnances d'un médecin dans le tableau
+     */
+    private void afficherOrdonnancesMedecin(String nomCompletMedecin) {
+        if (ordonnancesList != null) {
+            boolean ordonnancesTrouvees = false;
+
+            for (Ordonnance ordo : ordonnancesList) {
+                if (nomCompletMedecin.equals(ordo.getNomMedecin())) {
+                    ordonnancesTrouvees = true;
+
+                    // Construire la liste des médicaments
+                    String medicamentStr = "";
+                    if (ordo.getMedicaments() != null && !ordo.getMedicaments().isEmpty()) {
+                        medicamentStr = ordo.getMedicaments().stream()
+                                .map(m -> m.getMedicNom() + " (x" + m.getQuantite() + ")")
+                                .collect(Collectors.joining(", "));
+                    } else {
+                        medicamentStr = "Aucun médicament";
+                    }
+
+                    tableModelOrdo.addRow(new Object[]{
+                            ordo.getDateFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                            ordo.getNomMedecin(),
+                            ordo.getNomPatient(),
+                            medicamentStr
+                    });
+                }
+            }
+
+            if (!ordonnancesTrouvees) {
+                JOptionPane.showMessageDialog(this,
+                        "Aucune ordonnance trouvée pour ce médecin.",
+                        "Information",
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+    }
+
     private void retour() {
         if (previousFrame != null) {
-            previousFrame.setVisible(true); // réaffiche la fenêtre précédente
+            previousFrame.setVisible(true);
         }
-        this.dispose(); // ferme la fenêtre actuelle
+        this.dispose();
     }
 
     private void quitter() {
-        int reponse = JOptionPane.showConfirmDialog(historiqueOrdonnance.this, "Voulez-vous quitter l'application ?", "Quitter", JOptionPane.YES_NO_OPTION);
+        int reponse = JOptionPane.showConfirmDialog(historiqueOrdonnance.this,
+                "Voulez-vous quitter l'application ?",
+                "Quitter",
+                JOptionPane.YES_NO_OPTION);
         if (reponse == JOptionPane.YES_OPTION) {
             System.exit(0);
         }

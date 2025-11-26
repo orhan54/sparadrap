@@ -4,7 +4,6 @@ import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import fr.pompey.cda24060.DAO.PatientDAO;
 import fr.pompey.cda24060.exception.SaisieException;
-import fr.pompey.cda24060.model.Medecin;
 import fr.pompey.cda24060.model.Patient;
 
 import javax.swing.*;
@@ -35,10 +34,11 @@ public class consulterPatient extends JFrame {
     private String selectedValue;
     private JFrame previousFrame;
     private PatientDAO patientDAO;
+    private List<Patient> patientsList; // LISTE LOCALE au lieu de statique
 
     private DefaultTableModel tableModelPatient;
 
-    public consulterPatient(JFrame previousFrame) throws SaisieException {
+    public consulterPatient(JFrame previousFrame) {
         this.previousFrame = previousFrame;
 
         // Initialiser la DAO
@@ -54,7 +54,6 @@ public class consulterPatient extends JFrame {
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
 
-        //les attributs
         this.setTitle("Sparadrap");
         this.setIconImage(imageIcon.getImage());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -62,7 +61,8 @@ public class consulterPatient extends JFrame {
         this.setResizable(false);
         this.setContentPane(contentPane);
 
-        String[] colonnes = {"Nom", "Prenom", "Adresse", "Code postal", "Ville", "Téléphone", "Email", "Numero sécurité social", "Date de naissance", "Mutuelle", "Medecin"};
+        String[] colonnes = {"Nom", "Prenom", "Adresse", "Code postal", "Ville", "Téléphone",
+                "Email", "Numero sécurité social", "Date de naissance", "Mutuelle", "Medecin"};
         tableModelPatient = new DefaultTableModel(colonnes, 0);
         tablePatient.setModel(tableModelPatient);
 
@@ -83,61 +83,25 @@ public class consulterPatient extends JFrame {
             }
         });
 
-        créerUnCompteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                addClient();
-            }
-        });
-
-        modifierButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                updateClient();
-            }
-        });
-
-        supprimerButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                deleteClient();
-            }
-        });
-
-        retourButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                retour();
-            }
-        });
-
-        quitterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                quitter();
-            }
-        });
+        créerUnCompteButton.addActionListener(e -> addClient());
+        modifierButton.addActionListener(e -> updateClient());
+        supprimerButton.addActionListener(e -> deleteClient());
+        retourButton.addActionListener(e -> retour());
+        quitterButton.addActionListener(e -> quitter());
     }
 
     /**
-     * Charge les patients depuis la base de données et met à jour la liste statique
+     * Charge les patients depuis la base de données dans la liste locale
      */
     private void chargerPatientsDepuisBDD() {
         try {
             if (patientDAO != null) {
-                List<Patient> patientsFromDB = patientDAO.getAll();
-
-                // Vider la liste statique
-                Patient.getPatients().clear();
-
-                // Ajouter tous les médecins de la BDD
-                Patient.getPatients().addAll(patientsFromDB);
-
-                System.out.println("Chargement de " + patientsFromDB.size() + " médecins depuis la BDD");
+                patientsList = patientDAO.getAll();
+                System.out.println("Chargement de " + patientsList.size() + " patients depuis la BDD");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                    "Erreur lors du chargement des médecins: " + e.getMessage(),
+                    "Erreur lors du chargement des patients: " + e.getMessage(),
                     "Erreur",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -147,7 +111,7 @@ public class consulterPatient extends JFrame {
     /**
      * Rafraîchit l'affichage du comboBox après une modification
      */
-    public void rafraichirAffichage() throws SaisieException {
+    public void rafraichirAffichage() {
         // Recharger depuis la BDD
         chargerPatientsDepuisBDD();
 
@@ -159,43 +123,43 @@ public class consulterPatient extends JFrame {
         selectedValue = null;
     }
 
-    private void remplirComboBox() throws SaisieException {
+    private void remplirComboBox() {
         comboBoxClient.removeAllItems();
-
         comboBoxClient.addItem("Choisir un client");
-        comboBoxClient.setSelectedItem(0);
+        comboBoxClient.setSelectedIndex(0);
 
-        for (Patient p : Patient.getPatients()) {
-            comboBoxClient.addItem(p.getNom() + " " + p.getPrenom());
+        if (patientsList != null) {
+            for (Patient p : patientsList) {
+                comboBoxClient.addItem(p.getNom() + " " + p.getPrenom());
+            }
         }
 
         comboBoxClient.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                e.getSource();
-
                 String selected = (String) comboBoxClient.getSelectedItem();
-                //System.out.println("Vous avez séléctionné : " + selected);
                 selectedValue = selected;
 
-                if (selected.equals(comboBoxClient.getSelectedItem())) {
+                if (selected != null && !selected.equals("Choisir un client")) {
                     tableModelPatient.setRowCount(0);
 
-                    for (Patient p : Patient.getPatients()) {
-                        if (selected.equals(p.getNom() + " " + p.getPrenom())) {
-                            tableModelPatient.addRow(new Object[]{
-                                    p.getNom(),
-                                    p.getPrenom(),
-                                    p.getLieu().getAdresse(),
-                                    p.getLieu().getCodePostal(),
-                                    p.getLieu().getVille(),
-                                    p.getLieu().getTelephone(),
-                                    p.getLieu().getEmail(),
-                                    p.getPatNumeSecu(),
-                                    p.getPatDateNaissance(),
-                                    p.getMutuelle().getNom(),
-                                    p.getMedecin().getNom() + " " + p.getMedecin().getPrenom()
-                            });
+                    if (patientsList != null) {
+                        for (Patient p : patientsList) {
+                            if (selected.equals(p.getNom() + " " + p.getPrenom())) {
+                                tableModelPatient.addRow(new Object[]{
+                                        p.getNom(),
+                                        p.getPrenom(),
+                                        p.getLieu().getAdresse(),
+                                        p.getLieu().getCodePostal(),
+                                        p.getLieu().getVille(),
+                                        p.getLieu().getTelephone(),
+                                        p.getLieu().getEmail(),
+                                        p.getPatNumeSecu(),
+                                        p.getPatDateNaissanceFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                                        p.getMutuelle() != null ? p.getMutuelle().getNom() : "",
+                                        p.getMedecin() != null ? p.getMedecin().getNom() + " " + p.getMedecin().getPrenom() : ""
+                                });
+                            }
                         }
                     }
                 }
@@ -208,16 +172,16 @@ public class consulterPatient extends JFrame {
         try {
             registerPatient registerClient = new registerPatient(this);
             registerClient.setVisible(true);
-            this.setVisible(false); // Cache la fenêtre consulterClient
+            this.setVisible(false);
         } catch (Exception e) {
-            System.out.println("Erreur sur la vue créer un client" + e.getMessage());
+            System.out.println("Erreur sur la vue créer un client: " + e.getMessage());
         }
     }
 
     // Maj d'un client
     private void updateClient() {
         try {
-            if (selectedValue == null || selectedValue.equals("Choisir un patient")) {
+            if (selectedValue == null || selectedValue.equals("Choisir un client")) {
                 JOptionPane.showMessageDialog(this,
                         "Veuillez sélectionner un patient à modifier",
                         "Attention",
@@ -225,12 +189,14 @@ public class consulterPatient extends JFrame {
                 return;
             }
 
-            for (Patient p : Patient.getPatients()) {
-                if (selectedValue.equals(p.getNom() + " " + p.getPrenom())) {
-                    registerPatient updatePatient = new registerPatient(p, this);
-                    updatePatient.setVisible(true);
-                    this.setVisible(false);
-                    break;
+            if (patientsList != null) {
+                for (Patient p : patientsList) {
+                    if (selectedValue.equals(p.getNom() + " " + p.getPrenom())) {
+                        registerPatient updatePatient = new registerPatient(p, this);
+                        updatePatient.setVisible(true);
+                        this.setVisible(false);
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -242,7 +208,7 @@ public class consulterPatient extends JFrame {
     private void deleteClient() {
         int selectedRow = tablePatient.getSelectedRow();
 
-        if (selectedRow >= 0 && selectedValue != null && !selectedValue.equals("Choisir un patient")) {
+        if (selectedRow >= 0 && selectedValue != null && !selectedValue.equals("Choisir un client")) {
             int confirmation = JOptionPane.showConfirmDialog(this,
                     "Êtes-vous sûr de vouloir supprimer ce patient?",
                     "Confirmation",
@@ -250,10 +216,13 @@ public class consulterPatient extends JFrame {
 
             if (confirmation == JOptionPane.YES_OPTION) {
                 Patient patientToRemove = null;
-                for (Patient p : Patient.getPatients()) {
-                    if (selectedValue.equals(p.getNom() + " " + p.getPrenom())) {
-                        patientToRemove = p;
-                        break;
+
+                if (patientsList != null) {
+                    for (Patient p : patientsList) {
+                        if (selectedValue.equals(p.getNom() + " " + p.getPrenom())) {
+                            patientToRemove = p;
+                            break;
+                        }
                     }
                 }
 
@@ -263,19 +232,16 @@ public class consulterPatient extends JFrame {
                         boolean deleted = patientDAO.delete(patientToRemove.getId_Patient());
 
                         if (deleted) {
-                            // Supprimer de la liste statique
-                            Patient.getPatients().remove(patientToRemove);
-
                             // Rafraîchir l'affichage
                             rafraichirAffichage();
 
                             JOptionPane.showMessageDialog(this,
-                                    "Médecin supprimé avec succès",
+                                    "Patient supprimé avec succès",
                                     "Succès",
                                     JOptionPane.INFORMATION_MESSAGE);
                         } else {
                             JOptionPane.showMessageDialog(this,
-                                    "Erreur lors de la suppression du médecin",
+                                    "Erreur lors de la suppression du patient",
                                     "Erreur",
                                     JOptionPane.ERROR_MESSAGE);
                         }
@@ -284,14 +250,12 @@ public class consulterPatient extends JFrame {
                                 "Erreur lors de la suppression: " + e.getMessage(),
                                 "Erreur",
                                 JOptionPane.ERROR_MESSAGE);
-                    } catch (SaisieException e) {
-                        throw new RuntimeException(e);
                     }
                 }
             }
         } else {
             JOptionPane.showMessageDialog(this,
-                    "Veuillez sélectionner un médecin à supprimer",
+                    "Veuillez sélectionner un patient à supprimer",
                     "Attention",
                     JOptionPane.WARNING_MESSAGE);
         }
@@ -299,13 +263,16 @@ public class consulterPatient extends JFrame {
 
     private void retour() {
         if (previousFrame != null) {
-            previousFrame.setVisible(true); // réaffiche la fenêtre précédente
+            previousFrame.setVisible(true);
         }
-        this.dispose(); // ferme la fenêtre actuelle
+        this.dispose();
     }
 
     private void quitter() {
-        int reponse = JOptionPane.showConfirmDialog(consulterPatient.this, "Voulez-vous quitter l'application ?", "Quitter", JOptionPane.YES_NO_OPTION);
+        int reponse = JOptionPane.showConfirmDialog(consulterPatient.this,
+                "Voulez-vous quitter l'application ?",
+                "Quitter",
+                JOptionPane.YES_NO_OPTION);
         if (reponse == JOptionPane.YES_OPTION) {
             System.exit(0);
         }

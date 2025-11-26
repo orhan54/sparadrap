@@ -12,6 +12,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersonneTest {
 
+    // Classe interne permettant d'instancier Personne
+    private static class FakePersonne extends Personne {
+        public FakePersonne(String nom, String prenom, Lieu lieu) throws SaisieException {
+            super(nom, prenom, lieu);
+        }
+    }
+
     private Personne personne;
     private Lieu lieu;
     private Mutuelle mutuelle;
@@ -35,13 +42,13 @@ class PersonneTest {
                 lieu
         );
 
-        // Création d'une Personne avec le constructeur 3 paramètres
-        personne = new Personne("Dupont", "Jean", lieu);
+        // Création d'une FakePersonne
+        personne = new FakePersonne("Dupont", "Jean", lieu);
         personne.setMutuelle(mutuelle); // association d'une mutuelle
     }
 
     @Test
-    void testGetNom() throws SaisieException {
+    void testGetNom() {
         assertEquals("Dupont", personne.getNom());
     }
 
@@ -52,7 +59,7 @@ class PersonneTest {
     }
 
     @Test
-    void testGetPrenom() throws SaisieException {
+    void testGetPrenom() {
         assertEquals("Jean", personne.getPrenom());
     }
 
@@ -99,7 +106,7 @@ class PersonneTest {
 
     @Test
     void testNomInvalide() {
-        Exception exception = Assertions.<SaisieException>assertThrows(SaisieException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             personne.setNom("Dupont123"); // nom invalide
         });
         assertTrue(exception.getMessage().contains("Le nom n'est pas valide"));
@@ -107,7 +114,7 @@ class PersonneTest {
 
     @Test
     void testPrenomInvalide() {
-        Exception exception = Assertions.<SaisieException>assertThrows(SaisieException.class, () -> {
+        Exception exception = assertThrows(SaisieException.class, () -> {
             personne.setPrenom("Jean!"); // prénom invalide
         });
         assertTrue(exception.getMessage().contains("Le prenom n'est pas valide"));

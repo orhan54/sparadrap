@@ -45,6 +45,8 @@ public class consulterMedecin extends JFrame {
     private OrdonnanceDAO ordonnanceDAO;
 
     private DefaultTableModel tableModelMedecin;
+    private List<Medecin> medecinsList;
+    private List<Patient> patientsList;
 
     private String[] HEADER_PATIENT = new String[]{
             "Nom", "Prenom", "Adresse", "Code postal", "Ville",
@@ -74,7 +76,6 @@ public class consulterMedecin extends JFrame {
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
 
-        // Attributs JFrame
         this.setTitle("Sparadrap");
         this.setIconImage(imageIcon.getImage());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -93,22 +94,11 @@ public class consulterMedecin extends JFrame {
         comboBoxInformation.addItem("Liste des ordonnances du médecin");
         comboBoxInformation.setSelectedIndex(0);
 
-        // Charger les médecins depuis la BDD
-        chargerMedecinsDepuisBDD();
-
-        // Charger les patients depuis la BDD
-        chargerPatientsDepuisBDD();
-
-        // Listeners
+        // Charger les données depuis la BDD
+        chargerDonneesDepuisBDD();
         remplirComboBox();
 
-        comboBoxInformation.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                displayInformation();
-            }
-        });
-
+        comboBoxInformation.addActionListener(e -> displayInformation());
         retourButton.addActionListener(e -> retour());
         quitterButton.addActionListener(e -> quitter());
         creerUnMedecinButton.addActionListener(e -> creerMedecin());
@@ -118,7 +108,6 @@ public class consulterMedecin extends JFrame {
         this.pack();
         this.setLocationRelativeTo(null);
 
-        // Gestionnaire pour la croix (X)
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -127,85 +116,43 @@ public class consulterMedecin extends JFrame {
         });
     }
 
-    /**
-     * Charge les médecins depuis la base de données et met à jour la liste statique
-     */
-    private void chargerMedecinsDepuisBDD() {
+    private void chargerDonneesDepuisBDD() {
         try {
             if (medecinDAO != null) {
-                List<Medecin> medecinsFromDB = medecinDAO.getAll();
-
-                // Vider la liste statique
-                Medecin.getMedecins().clear();
-
-                // Ajouter tous les médecins de la BDD
-                Medecin.getMedecins().addAll(medecinsFromDB);
-
-                System.out.println("Chargement de " + medecinsFromDB.size() + " médecins depuis la BDD");
+                medecinsList = medecinDAO.getAll();
+                System.out.println("Chargement de " + medecinsList.size() + " médecins depuis la BDD");
             }
-        } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,
-                    "Erreur lors du chargement des médecins: " + e.getMessage(),
-                    "Erreur",
-                    JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Charge les patients depuis la base de données et met à jour la liste statique
-     */
-    private void chargerPatientsDepuisBDD() {
-        try {
             if (patientDAO != null) {
-                List<Patient> patientsFromDB = patientDAO.getAll();
-
-                // Vider la liste statique
-                Patient.getPatients().clear();
-
-                // Ajouter tous les patients de la BDD
-                Patient.getPatients().addAll(patientsFromDB);
-
-                System.out.println("Chargement de " + patientsFromDB.size() + " patients depuis la BDD");
+                patientsList = patientDAO.getAll();
+                System.out.println("Chargement de " + patientsList.size() + " patients depuis la BDD");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
-                    "Erreur lors du chargement des patients: " + e.getMessage(),
+                    "Erreur lors du chargement des données: " + e.getMessage(),
                     "Erreur",
                     JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
 
-    /**
-     * Rafraîchit l'affichage du comboBox après une modification
-     */
     public void rafraichirAffichage() {
-        // Recharger depuis la BDD
-        chargerMedecinsDepuisBDD();
-        chargerPatientsDepuisBDD();
-
-        // Remplir à nouveau le comboBox
+        chargerDonneesDepuisBDD();
         remplirComboBox();
-
-        // Réinitialiser le tableau
         tableModelMedecin.setRowCount(0);
         selectedValue = null;
     }
 
-    // Affichage dynamique Patients / Ordonnances
     public void displayInformation() {
         String selectedMedecin = (String) comboBoxMedecin.getSelectedItem();
         int selectedInfo = comboBoxInformation.getSelectedIndex();
 
         if (selectedInfo == 0 || selectedMedecin == null || selectedMedecin.equals("Choisir un médecin")) {
             titreFiltreInfo.setText("Choisir un filtre...");
-            // Vider le tableau
             configureTable(new String[]{"Aucune donnée"});
             return;
         }
 
-        Medecin medecinChoisi = Medecin.getMedecins().stream()
+        Medecin medecinChoisi = medecinsList.stream()
                 .filter(m -> (m.getNom() + " " + m.getPrenom()).equals(selectedMedecin))
                 .findFirst()
                 .orElse(null);
@@ -215,12 +162,10 @@ public class consulterMedecin extends JFrame {
         }
 
         if (selectedInfo == 1) {
-            // Patients du médecin - CHARGER DEPUIS LA BDD
             titreFiltreInfo.setText("Liste des patients du médecin : " + selectedMedecin);
 
             try {
-                // Filtrer les patients chargés depuis la BDD
-                List<Patient> patientsMedecin = Patient.getPatients().stream()
+                List<Patient> patientsMedecin = patientsList.stream()
                         .filter(p -> p.getMedecin() != null &&
                                 p.getMedecin().getId_Medecin() == medecinChoisi.getId_Medecin())
                         .collect(Collectors.toList());
@@ -228,8 +173,7 @@ public class consulterMedecin extends JFrame {
                 configureTable(HEADER_PATIENT);
                 constructDataTable(patientsMedecin);
 
-                System.out.println("Affichage de " + patientsMedecin.size() + " patients pour le médecin " + selectedMedecin);
-
+                System.out.println("Affichage de " + patientsMedecin.size() + " patients");
             } catch (Exception e) {
                 JOptionPane.showMessageDialog(this,
                         "Erreur lors de l'affichage des patients: " + e.getMessage(),
@@ -239,18 +183,15 @@ public class consulterMedecin extends JFrame {
             }
 
         } else if (selectedInfo == 2) {
-            // Ordonnances du médecin - CHARGER DEPUIS LA BDD
             titreFiltreInfo.setText("Liste des ordonnances du médecin : " + selectedMedecin);
 
             try {
-                // Charger les ordonnances depuis la BDD
                 List<Ordonnance> ordonnancesMedecin = ordonnanceDAO.getByNomMedecin(selectedMedecin);
 
                 configureTable(HEADER_ORDONNANCE);
                 constructDataTable(ordonnancesMedecin);
 
-                System.out.println("Affichage de " + ordonnancesMedecin.size() + " ordonnances pour le médecin " + selectedMedecin);
-
+                System.out.println("Affichage de " + ordonnancesMedecin.size() + " ordonnances");
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(this,
                         "Erreur lors de l'affichage des ordonnances: " + e.getMessage(),
@@ -261,7 +202,6 @@ public class consulterMedecin extends JFrame {
         }
     }
 
-    // Préparer le modèle de table
     private void configureTable(String[] header) {
         TableModel model = new DefaultTableModel(header, 0);
         this.tableFiltreInformation.setModel(model);
@@ -269,7 +209,6 @@ public class consulterMedecin extends JFrame {
         this.tableFiltreInformation.repaint();
     }
 
-    // Remplir le tableau avec les données
     private <T> void constructDataTable(List<T> dataListe) {
         DefaultTableModel model = (DefaultTableModel) this.tableFiltreInformation.getModel();
         model.setRowCount(0);
@@ -286,7 +225,7 @@ public class consulterMedecin extends JFrame {
                         p.getLieu().getTelephone(),
                         p.getLieu().getEmail(),
                         p.getPatNumeSecu(),
-                        p.getPatDateNaissance(),
+                        p.getPatDateNaissanceFormatee(), // DATE FORMATÉE
                         p.getMutuelle() != null ? p.getMutuelle().getNom() : "",
                         p.getMedecin() != null ? p.getMedecin().getNom() + " " + p.getMedecin().getPrenom() : ""
                 });
@@ -300,7 +239,7 @@ public class consulterMedecin extends JFrame {
                                 .collect(Collectors.joining(", "));
 
                 model.addRow(new Object[]{
-                        o.getDate(),
+                        o.getDateFormatee(), // DATE FORMATÉE
                         o.getNomMedecin(),
                         o.getNomPatient(),
                         medicamentsStr
@@ -309,15 +248,15 @@ public class consulterMedecin extends JFrame {
         }
     }
 
-    // Remplir la comboBox médecin
     private void remplirComboBox() {
         comboBoxMedecin.removeAllItems();
-
         comboBoxMedecin.addItem("Choisir un médecin");
         comboBoxMedecin.setSelectedIndex(0);
 
-        for (Medecin m : Medecin.getMedecins()) {
-            comboBoxMedecin.addItem(m.getNom() + " " + m.getPrenom());
+        if (medecinsList != null) {
+            for (Medecin m : medecinsList) {
+                comboBoxMedecin.addItem(m.getNom() + " " + m.getPrenom());
+            }
         }
 
         comboBoxMedecin.addActionListener(new ActionListener() {
@@ -327,36 +266,35 @@ public class consulterMedecin extends JFrame {
                 selectedValue = selected;
                 tableModelMedecin.setRowCount(0);
 
-                for (Medecin m : Medecin.getMedecins()) {
-                    if (selectedValue != null && selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
-                        tableModelMedecin.addRow(new Object[]{
-                                m.getNom(),
-                                m.getPrenom(),
-                                m.getLieu().getAdresse(),
-                                m.getLieu().getCodePostal(),
-                                m.getLieu().getVille(),
-                                m.getLieu().getTelephone(),
-                                m.getLieu().getEmail(),
-                                m.getNumeroAgreement()
-                        });
+                if (medecinsList != null) {
+                    for (Medecin m : medecinsList) {
+                        if (selectedValue != null && selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
+                            tableModelMedecin.addRow(new Object[]{
+                                    m.getNom(),
+                                    m.getPrenom(),
+                                    m.getLieu().getAdresse(),
+                                    m.getLieu().getCodePostal(),
+                                    m.getLieu().getVille(),
+                                    m.getLieu().getTelephone(),
+                                    m.getLieu().getEmail(),
+                                    m.getNumeroAgreement()
+                            });
+                        }
                     }
                 }
 
-                // Réinitialiser le filtre d'information
                 comboBoxInformation.setSelectedIndex(0);
                 titreFiltreInfo.setText("Choisir un filtre...");
             }
         });
     }
 
-    // Appel de la view pour créer un médecin
     private void creerMedecin() {
         registerMedecin registerMedecin = new registerMedecin(this);
         registerMedecin.setVisible(true);
         this.setVisible(false);
     }
 
-    // Update un médecin
     private void updateMedecin() {
         try {
             if (selectedValue == null || selectedValue.equals("Choisir un médecin")) {
@@ -367,12 +305,14 @@ public class consulterMedecin extends JFrame {
                 return;
             }
 
-            for (Medecin m : Medecin.getMedecins()) {
-                if (selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
-                    registerMedecin updateMedecin = new registerMedecin(m, this);
-                    updateMedecin.setVisible(true);
-                    this.setVisible(false);
-                    break;
+            if (medecinsList != null) {
+                for (Medecin m : medecinsList) {
+                    if (selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
+                        registerMedecin updateMedecin = new registerMedecin(m, this);
+                        updateMedecin.setVisible(true);
+                        this.setVisible(false);
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
@@ -380,7 +320,6 @@ public class consulterMedecin extends JFrame {
         }
     }
 
-    // Delete un médecin
     private void deleteMedecin() {
         int selectedRow = tableMedecin.getSelectedRow();
 
@@ -392,25 +331,21 @@ public class consulterMedecin extends JFrame {
 
             if (confirmation == JOptionPane.YES_OPTION) {
                 Medecin medecinToRemove = null;
-                for (Medecin m : Medecin.getMedecins()) {
-                    if (selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
-                        medecinToRemove = m;
-                        break;
+                if (medecinsList != null) {
+                    for (Medecin m : medecinsList) {
+                        if (selectedValue.equals(m.getNom() + " " + m.getPrenom())) {
+                            medecinToRemove = m;
+                            break;
+                        }
                     }
                 }
 
                 if (medecinToRemove != null) {
                     try {
-                        // Supprimer de la BDD
                         boolean deleted = medecinDAO.delete(medecinToRemove.getId_Medecin());
 
                         if (deleted) {
-                            // Supprimer de la liste statique
-                            Medecin.getMedecins().remove(medecinToRemove);
-
-                            // Rafraîchir l'affichage
                             rafraichirAffichage();
-
                             JOptionPane.showMessageDialog(this,
                                     "Médecin supprimé avec succès",
                                     "Succès",
@@ -437,7 +372,6 @@ public class consulterMedecin extends JFrame {
         }
     }
 
-    // Retour de la page
     private void retour() {
         if (previousFrame != null) {
             previousFrame.setVisible(true);
@@ -445,7 +379,6 @@ public class consulterMedecin extends JFrame {
         this.dispose();
     }
 
-    // Quitter l'application
     private void quitter() {
         int reponse = JOptionPane.showConfirmDialog(consulterMedecin.this,
                 "Voulez-vous quitter l'application ?",
@@ -622,4 +555,6 @@ public class consulterMedecin extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
+    // Gardez votre code $$$setupUI$$$ existant ici
 }

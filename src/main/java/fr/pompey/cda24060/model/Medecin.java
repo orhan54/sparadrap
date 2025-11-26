@@ -11,16 +11,12 @@ public class Medecin extends Personne {
 
     private int Id_Medecin;
     private String numeroAgreement;
-    private static List<Medecin> medecins = new ArrayList<>();
     private List<Patient> patients = new ArrayList<>();
 
     /**
-     * Instantiates a new Medecin.
-     *
-     * @throws SaisieException the saisie exception
+     * Constructeur vide pour les DAO
      */
-    // Constructeurs
-    public Medecin() throws SaisieException {
+    public Medecin() {
         super();
     }
 
@@ -49,6 +45,11 @@ public class Medecin extends Personne {
         return Id_Medecin;
     }
 
+    /**
+     * Sets id medecin.
+     *
+     * @param id_Medecin the id medecin
+     */
     public void setId_Medecin(int id_Medecin) {
         Id_Medecin = id_Medecin;
     }
@@ -73,15 +74,6 @@ public class Medecin extends Personne {
             throw new SaisieException("Erreur sur numéro d'agrément : " + pNumeroAgreement);
         }
         this.numeroAgreement = pNumeroAgreement;
-    }
-
-    /**
-     * Gets medecins.
-     *
-     * @return the medecins
-     */
-    public static List<Medecin> getMedecins() {
-        return medecins;
     }
 
     /**

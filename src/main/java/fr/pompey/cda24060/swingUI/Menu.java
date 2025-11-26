@@ -66,12 +66,8 @@ public class Menu extends JFrame {
         buttonQuitterMenu.addActionListener(e -> quitter());
 
         buttonHistoriqueOrdo.addActionListener(e -> {
-            try {
-                historiqueOrdonnance h = new historiqueOrdonnance(Menu.this);
-                h.setVisible(true);
-            } catch (SaisieException ex) {
-                throw new RuntimeException(ex);
-            }
+            historiqueOrdonnance h = new historiqueOrdonnance(Menu.this);
+            h.setVisible(true);
         });
 
         buttonAddMedic.addActionListener(e -> {

@@ -4,160 +4,87 @@ import fr.pompey.cda24060.exception.SaisieException;
 
 import static fr.pompey.cda24060.utility.RegexUtility.regexAlpha;
 
-/**
- * The type Personne.
- */
-public class Personne {
-    private String nom, prenom;
+public abstract class Personne {
+    private String nom;
+    private String prenom;
     private Lieu lieu;
     private Mutuelle mutuelle;
     private Medecin medecin;
 
     /**
-     * Instantiates a new Personne.
-     *
-     * @param pNom     the nom
-     * @param pPrenom  the prenom
-     * @param lieu     the lieu
-     * @param mutuelle the mutuelle
-     * @param medecin
-     * @throws SaisieException the saisie exception
+     * Constructeur vide pour les DAO
      */
-    // constructeur de ma classe personne
-    public Personne(String pNom, String pPrenom, Lieu lieu, Mutuelle mutuelle, Medecin medecin) throws SaisieException {
-        this.setNom(pNom);
-        this.setPrenom(pPrenom);
+    public Personne() {
+        // Constructeur vide
+    }
+
+    /**
+     * Constructeur pour Medecin (sans mutuelle ni medecin)
+     */
+    public Personne(String nom, String prenom, Lieu lieu) throws SaisieException {
+        this.setNom(nom);
+        this.setPrenom(prenom);
+        this.setLieu(lieu);
+    }
+
+    /**
+     * Constructeur complet pour Patient
+     */
+    public Personne(String nom, String prenom, Lieu lieu, Mutuelle mutuelle, Medecin medecin) throws SaisieException {
+        this.setNom(nom);
+        this.setPrenom(prenom);
         this.setLieu(lieu);
         this.setMutuelle(mutuelle);
         this.setMedecin(medecin);
     }
 
-    /**
-     * Instantiates a new Personne.
-     *
-     * @param pNom    the p nom
-     * @param pPrenom the p prenom
-     * @param lieu    the lieu
-     * @throws SaisieException the saisie exception
-     */
-    public Personne(String pNom, String pPrenom, Lieu lieu) throws SaisieException {
-        this.setNom(pNom);
-        this.setPrenom(pPrenom);
-        this.setLieu(lieu);
-    }
-
-    /**
-     * Instantiates a new Personne.
-     *
-     * @throws SaisieException the saisie exception
-     */
-    public Personne() throws SaisieException {}
-
-    // Getters & Setters
-
-    /**
-     * Gets nom.
-     *
-     * @return the nom
-     */
+    // Getters et Setters
     public String getNom() {
         return nom;
     }
 
-    /**
-     * Sets nom.
-     *
-     * @throws SaisieException the saisie exception
-     */
     public void setNom(String pNom) throws SaisieException {
-        if (!regexAlpha(pNom)){
-            throw new SaisieException("Le nom n'est pas valide !");
-        }else{
-            this.nom = pNom;
+        if (pNom == null || !regexAlpha(pNom)) {
+            throw new SaisieException("Erreur sur le nom : " + pNom);
         }
+        this.nom = pNom;
     }
 
-    /**
-     * Gets prenom.
-     *
-     * @return the prenom
-     */
     public String getPrenom() {
         return prenom;
     }
 
-    /**
-     * Sets prenom.
-     *
-     * @throws SaisieException the saisie exception
-     */
     public void setPrenom(String pPrenom) throws SaisieException {
-        if (!regexAlpha(pPrenom)){
-            throw new SaisieException("Le prenom n'est pas valide !");
-        }else{
-            this.prenom = pPrenom;
+        if (pPrenom == null || !regexAlpha(pPrenom)) {
+            throw new SaisieException("Erreur sur le prénom : " + pPrenom);
         }
+        this.prenom = pPrenom;
     }
 
-    /**
-     * Gets lieu.
-     *
-     * @return the lieu
-     */
     public Lieu getLieu() {
         return lieu;
     }
 
-    /**
-     * Sets lieu.
-     *
-     * @param lieu the lieu
-     */
-    public void setLieu(Lieu lieu) {
-        this.lieu = lieu;
+    public void setLieu(Lieu pLieu) {
+        this.lieu = pLieu;
     }
 
-    /**
-     * Gets mutuelle.
-     *
-     * @return the mutuelle
-     */
     public Mutuelle getMutuelle() {
         return mutuelle;
     }
 
-    /**
-     * Sets mutuelle.
-     *
-     * @param mutuelle the mutuelle
-     */
-    public void setMutuelle(Mutuelle mutuelle) {
-        this.mutuelle = mutuelle;
+    public void setMutuelle(Mutuelle pMutuelle) {
+        this.mutuelle = pMutuelle;
     }
 
     public Medecin getMedecin() {
         return medecin;
     }
 
-    public void setMedecin(Medecin medecin) {
-        this.medecin = medecin;
+    public void setMedecin(Medecin pMedecin) {
+        this.medecin = pMedecin;
     }
 
-    // StringBuilder pour afficher le toString de Personne
     @Override
-    public String toString() {
-        StringBuilder sbper = new StringBuilder();
-        sbper.append("- Nom : ").append(getNom()).append("\n");
-        sbper.append("- Prenom : ").append(getPrenom()).append("\n");
-        if (getLieu() != null) {
-            sbper.append(getLieu().toString());
-        }
-        if (getMutuelle() != null) {
-            sbper.append(getMutuelle().getNom()).append("\n");
-        }
-        if (getMedecin() != null) {
-            sbper.append(getMedecin().getNom()).append(getMedecin().getPrenom()).append("\n");
-        }
-        return sbper.toString();
-    }
+    public abstract String toString();
 }

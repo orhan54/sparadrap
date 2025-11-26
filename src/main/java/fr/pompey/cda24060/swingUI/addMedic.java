@@ -32,6 +32,7 @@ public class addMedic extends JFrame {
     private JTable tableDetailsMedic;
     private JFrame previousFrame;
     private Stock_MedicamentDAO stock_medicamentDAO;
+    private List<Stock_Medicament> stockMedicamentsList;
 
     private DefaultTableModel tableModel;
 
@@ -51,7 +52,6 @@ public class addMedic extends JFrame {
         ImageIcon imageIcon = new ImageIcon(Objects.requireNonNull(getClass().getResource("/image/miniLogo.png")));
         Dimension dimension = new Dimension(1600, 1000);
 
-        //les attributs
         this.setTitle("Sparadrap");
         this.setIconImage(imageIcon.getImage());
         this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -59,19 +59,18 @@ public class addMedic extends JFrame {
         this.setResizable(false);
         this.setContentPane(contentPane);
 
-        String[] colonnes = {"Nom médicament", "Catégorie médicament", "Quantité médicament", "Date mise en service", "Date enregistrement stock", "Prix médicament"};
+        String[] colonnes = {"Nom médicament", "Catégorie médicament", "Quantité médicament",
+                "Date mise en service", "Date enregistrement stock", "Prix médicament"};
         tableModel = new DefaultTableModel(colonnes, 0);
         tableDetailsMedic.setModel(tableModel);
 
-        // charger les médicament depuis le stock
+        // Charger les médicaments depuis la BDD
         chargerStockMedicamentDepuisBDD();
-
         remplirComboBox();
 
         this.pack();
         this.setLocationRelativeTo(null);
 
-        // Gestionnaire pour la croix (X)
         this.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
@@ -79,32 +78,15 @@ public class addMedic extends JFrame {
             }
         });
 
-        retourButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                retour();
-            }
-        });
-        quitterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                quitter();
-            }
-        });
+        retourButton.addActionListener(e -> retour());
+        quitterButton.addActionListener(e -> quitter());
     }
 
     private void chargerStockMedicamentDepuisBDD() {
         try {
             if (stock_medicamentDAO != null) {
-                List<Stock_Medicament> stockMedicamentsFromDB = stock_medicamentDAO.getAll();
-
-                // Vider la liste statique
-                Stock_Medicament.getMedicaments().clear();
-
-                // Ajouter tous les médicaments de la BDD
-                Stock_Medicament.getMedicaments().addAll(stockMedicamentsFromDB);
-
-                System.out.println("Chargement de " + stockMedicamentsFromDB.size() + " médicaments depuis la BDD");
+                stockMedicamentsList = stock_medicamentDAO.getAll();
+                System.out.println("Chargement de " + stockMedicamentsList.size() + " médicaments depuis la BDD");
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this,
@@ -117,59 +99,59 @@ public class addMedic extends JFrame {
 
     private void remplirComboBox() {
         comboBoxDetailsMedic.removeAllItems();
-
-        chargerStockMedicamentDepuisBDD();
-
         comboBoxDetailsMedic.addItem("Voir le détails d'un médicament");
         comboBoxDetailsMedic.setSelectedIndex(0);
 
-
-        for (Stock_Medicament medicament : Stock_Medicament.getMedicaments()) {
-            comboBoxDetailsMedic.addItem(medicament.getMedicNom());
+        if (stockMedicamentsList != null) {
+            for (Stock_Medicament medicament : stockMedicamentsList) {
+                comboBoxDetailsMedic.addItem(medicament.getMedicNom());
+            }
         }
 
         comboBoxDetailsMedic.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                e.getSource();
-
                 String selected = (String) comboBoxDetailsMedic.getSelectedItem();
 
-                if (selected.equals(comboBoxDetailsMedic.getSelectedItem())) {
+                if (selected != null && !selected.equals("Voir le détails d'un médicament")) {
                     tableModel.setRowCount(0);
 
-                    for (Stock_Medicament m : Stock_Medicament.getMedicaments()) {
-                        if (m.getMedicNom().equals(comboBoxDetailsMedic.getSelectedItem())) {
-                            tableModel.addRow(new Object[]{
-                                    m.getMedicNom(),
-                                    m.getMedicCategorie(),
-                                    m.getQuantite(),
-                                    m.getDateMiseEnService(),
-                                    m.getMedicDateEntreeStock(),
-                                    m.getMedicPrixUnitaire() + "€"
-                            });
+                    if (stockMedicamentsList != null) {
+                        for (Stock_Medicament m : stockMedicamentsList) {
+                            if (m.getMedicNom().equals(selected)) {
+                                tableModel.addRow(new Object[]{
+                                        m.getMedicNom(),
+                                        m.getMedicCategorie(),
+                                        m.getQuantite(),
+                                        m.getDateMiseEnServiceFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                                        m.getMedicDateEntreeStockFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                                        String.format("%.2f €", m.getMedicPrixUnitaire())
+                                });
+                                break;
+                            }
                         }
                     }
                 }
-
             }
         });
     }
 
     private void retour() {
         if (previousFrame != null) {
-            previousFrame.setVisible(true); // réaffiche la fenêtre précédente
+            previousFrame.setVisible(true);
         }
-        this.dispose(); // ferme la fenêtre actuelle
+        this.dispose();
     }
 
     private void quitter() {
-        int reponse = JOptionPane.showConfirmDialog(addMedic.this, "Voulez-vous quitter l'application ?", "Quitter", JOptionPane.YES_NO_OPTION);
+        int reponse = JOptionPane.showConfirmDialog(addMedic.this,
+                "Voulez-vous quitter l'application ?",
+                "Quitter",
+                JOptionPane.YES_NO_OPTION);
         if (reponse == JOptionPane.YES_OPTION) {
             System.exit(0);
         }
     }
-
 
     {
 // GUI initializer generated by IntelliJ IDEA GUI Designer
@@ -300,4 +282,6 @@ public class addMedic extends JFrame {
     public JComponent $$$getRootComponent$$$() {
         return contentPane;
     }
+
+    // Gardez votre code $$$setupUI$$$ existant ici
 }

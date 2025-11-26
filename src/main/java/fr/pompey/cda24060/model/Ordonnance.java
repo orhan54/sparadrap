@@ -1,176 +1,121 @@
 package fr.pompey.cda24060.model;
 
-import fr.pompey.cda24060.exception.SaisieException;
-
 import java.sql.Date;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-import static fr.pompey.cda24060.utility.RegexUtility.dateValide;
-import static fr.pompey.cda24060.utility.RegexUtility.regexAlpha;
-
-/**
- * The type Ordonnance.
- */
 public class Ordonnance {
-    // Attributs pour la classe Ordonnance
     private int Id_Ordonnance;
-    private String ordoDate, nomMedecin, nomPatient;
-
-    // Liste des médicaments pour cette ordonnance
+    private Date date;
+    private String nomMedecin;
+    private String nomPatient;
+    private Medecin medecin;
+    private Patient patient;
     private List<Stock_Medicament> medicaments;
 
-    // Liste statique de toutes les ordonnances
-    private static List<Ordonnance> ordonnances = new ArrayList<>();
+    // Formatter pour les dates au format dd/MM/yyyy
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    /**
-     * Constructeur pour la classe Ordonnance
-     *
-     * @param pOrdoDate        the pOrdoDate
-     * @param pNomMedecin le nom du médecin
-     * @param pNomPatient le nom du patient
-     * @param medicaments la liste des médicaments
-     * @throws SaisieException exception de saisie
-     */
-    public Ordonnance(String pOrdoDate, String pNomMedecin, String pNomPatient, List<Stock_Medicament> medicaments) throws SaisieException {
-        this.setOrdoDate(pOrdoDate);
-        //this.dateOrdonnance = LocalDateTime.now();  // *** mise en commentaire pour tester les differentes dates de initialisation ***
-        this.setNomMedecin(pNomMedecin);
-        this.setNomPatient(pNomPatient);
-
-        // Initialiser la liste des médicaments
+    public Ordonnance(Date date, String nomMedecin, String nomPatient,
+                      Medecin medecin, Patient patient) {
+        this.date = date;
+        this.nomMedecin = nomMedecin;
+        this.nomPatient = nomPatient;
+        this.medecin = medecin;
+        this.patient = patient;
         this.medicaments = new ArrayList<>();
-        if (medicaments != null && !medicaments.isEmpty()) {
-            this.medicaments.addAll(medicaments);
-        }
-
-        // Ajouter cette ordonnance à la liste statique
-        Ordonnance.ordonnances.add(this);
-    }
-
-    // Méthodes pour gérer les médicaments
-
-    /**
-     *
-     * @return une copie de la liste des médicaments
-     */
-    public List<Stock_Medicament> getMedicaments() {
-        return new ArrayList<>(this.medicaments);
-    }
-
-    // Méthodes statiques
-
-    public static List<Ordonnance> getOrdonnances() {
-        return new ArrayList<>(ordonnances);
     }
 
     // Getters et Setters
-
-
-    /**
-     * Gets id ordonnance.
-     *
-     * @return the id ordonnance
-     */
     public int getId_Ordonnance() {
         return Id_Ordonnance;
     }
 
-    /**
-     * Sets id ordonnance.
-     *
-     * @param id_Ordonnance the id ordonnance
-     */
     public void setId_Ordonnance(int id_Ordonnance) {
         Id_Ordonnance = id_Ordonnance;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
     /**
-     * Sets date.
-     *
-     * @param pOrdoDate the p ordo date
-     * @throws SaisieException the saisie exception
+     * Retourne la date formatée au format dd/MM/yyyy
      */
-    public void setOrdoDate(String pOrdoDate) throws SaisieException {
-        if (!dateValide(pOrdoDate)) {
-            throw new SaisieException("Le date n'est pas valide.");
-        }else{
-            this.ordoDate = pOrdoDate;
+    public String getDateFormatee() {
+        if (this.date != null) {
+            return this.date.toLocalDate().format(DATE_FORMATTER);
         }
+        return "";
     }
 
-    /**
-     * Gets date.
-     *
-     * @return the date
-     */
-    public String getDate() {
-        return this.ordoDate;
+    public void setDate(Date date) {
+        this.date = date;
     }
 
-    /**
-     * Gets nom medecin.
-     *
-     * @return the nom medecin
-     */
     public String getNomMedecin() {
-        return this.nomMedecin;
+        return nomMedecin;
     }
 
-    /**
-     * Sets nom medecin.
-     *
-     * @param pNomMedecin       the nom medecin
-     * @throws SaisieException  the saisie exception
-     */
-    public void setNomMedecin(String pNomMedecin) throws SaisieException {
-        if (!regexAlpha(pNomMedecin) && !pNomMedecin.isEmpty()) {
-            throw new SaisieException("Erreur sur le nom du médecin : " + pNomMedecin);
-        } else {
-            this.nomMedecin = pNomMedecin;
-        }
+    public void setNomMedecin(String nomMedecin) {
+        this.nomMedecin = nomMedecin;
     }
 
-    /**
-     * Gets nom patient.
-     *
-     * @return the nom patient
-     */
     public String getNomPatient() {
-        return this.nomPatient;
+        return nomPatient;
     }
 
-    /**
-     * Sets nom patient.
-     *
-     * @param pNomPatient       the nom patient
-     * @throws SaisieException  the saisie exception
-     */
-    public void setNomPatient(String pNomPatient) throws SaisieException {
-        if (!regexAlpha(pNomPatient) && !pNomPatient.isEmpty()) {
-            throw new SaisieException("Erreur sur le nom du patient : " + pNomPatient);
-        } else {
-            this.nomPatient = pNomPatient;
-        }
+    public void setNomPatient(String nomPatient) {
+        this.nomPatient = nomPatient;
+    }
+
+    public Medecin getMedecin() {
+        return medecin;
+    }
+
+    public void setMedecin(Medecin medecin) {
+        this.medecin = medecin;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
+
+    public List<Stock_Medicament> getMedicaments() {
+        return medicaments;
+    }
+
+    public void setMedicaments(List<Stock_Medicament> medicaments) {
+        this.medicaments = medicaments;
+    }
+
+    public void ajouterMedicament(Stock_Medicament medicament) {
+        this.medicaments.add(medicament);
     }
 
     @Override
     public String toString() {
-        StringBuilder sbo = new StringBuilder();
-        sbo.append("\nOrdonnance :\n");
-        sbo.append("- Date ordonnance : ").append(ordoDate).append("\n");
-        sbo.append("- Nom médecin : ").append(nomMedecin).append("\n");
-        sbo.append("- Nom patient : ").append(nomPatient).append("\n");
-        sbo.append("Liste des médicaments :\n");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Ordonnance n°").append(Id_Ordonnance).append("\n");
+        sb.append("Date : ").append(getDateFormatee()).append("\n");
+        sb.append("Médecin : ").append(nomMedecin).append("\n");
+        sb.append("Patient : ").append(nomPatient).append("\n");
+        sb.append("Médicaments prescrits :\n");
 
         if (medicaments.isEmpty()) {
-            sbo.append("  Aucun médicament prescrit\n");
+            sb.append("  - Aucun médicament\n");
         } else {
-            for (int i = 0; i < medicaments.size(); i++) {
-                sbo.append("  ").append(i + 1).append(". ").append(medicaments.get(i)).append("\n");
+            for (Stock_Medicament m : medicaments) {
+                sb.append("  - ").append(m.getMedicNom())
+                        .append(" (").append(m.getQuantite()).append(")\n");
             }
         }
 
-        return sbo.toString();
+        return sb.toString();
     }
 }
