@@ -16,7 +16,6 @@ class MedecinTest {
     @BeforeEach
     void setUp() throws SaisieException {
         // Création d'un lieu valide pour le médecin
-
         lieu = new Lieu(
                 "10 rue de Paris",
                 "testmedecin@example.com",
@@ -31,8 +30,9 @@ class MedecinTest {
 
     @Test
     void testGetMedecins() {
-        // La liste statique doit être accessible
+        // La liste statique doit être accessible et contenir au moins le médecin créé
         assertNotNull(Medecin.getMedecins());
+        assertTrue(Medecin.getMedecins().contains(medecin));
     }
 
     @Test
@@ -42,8 +42,8 @@ class MedecinTest {
 
     @Test
     void testSetNumeroAgreement() throws SaisieException {
-        medecin.setNumeroAgreement("12345678901");
-        assertEquals("12345678901", medecin.getNumeroAgreement());
+        medecin.setNumeroAgreement("98765432100");
+        assertEquals("98765432100", medecin.getNumeroAgreement());
     }
 
     @Test
@@ -59,7 +59,7 @@ class MedecinTest {
         String str = medecin.toString();
         assertTrue(str.contains("Dupont"));
         assertTrue(str.contains("Jean"));
-        assertTrue(str.contains("12345"));
+        assertTrue(str.contains("12345678901"));
         assertTrue(str.contains("Paris")); // contenu du lieu
     }
 }

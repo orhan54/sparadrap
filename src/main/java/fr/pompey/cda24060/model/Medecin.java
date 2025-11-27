@@ -13,6 +13,9 @@ public class Medecin extends Personne {
     private String numeroAgreement;
     private List<Patient> patients = new ArrayList<>();
 
+    // ✅ Liste statique pour tous les médecins
+    private static List<Medecin> medecins = new ArrayList<>();
+
     /**
      * Constructeur vide pour les DAO
      */
@@ -21,54 +24,21 @@ public class Medecin extends Personne {
     }
 
     /**
-     * Instantiates a new Medecin.
-     *
-     * @param pNom             the p nom
-     * @param pPrenom          the p prenom
-     * @param pNumeroAgreement the p numero agreement
-     * @param lieu             the lieu
-     * @throws SaisieException the saisie exception
+     * Constructeur principal
      */
     public Medecin(String pNom, String pPrenom, String pNumeroAgreement, Lieu lieu) throws SaisieException {
         super(pNom, pPrenom, lieu);
         this.setNumeroAgreement(pNumeroAgreement);
+
+        // ✅ Ajouter ce médecin à la liste statique
+        medecins.add(this);
     }
 
     // Getter & Setter
+    public int getId_Medecin() { return Id_Medecin; }
+    public void setId_Medecin(int id_Medecin) { Id_Medecin = id_Medecin; }
 
-    /**
-     * Gets id medecin.
-     *
-     * @return the id medecin
-     */
-    public int getId_Medecin() {
-        return Id_Medecin;
-    }
-
-    /**
-     * Sets id medecin.
-     *
-     * @param id_Medecin the id medecin
-     */
-    public void setId_Medecin(int id_Medecin) {
-        Id_Medecin = id_Medecin;
-    }
-
-    /**
-     * Gets numero agreement.
-     *
-     * @return the numero agreement
-     */
-    public String getNumeroAgreement() {
-        return numeroAgreement;
-    }
-
-    /**
-     * Sets numero agreement.
-     *
-     * @param pNumeroAgreement the p numero agreement
-     * @throws SaisieException the saisie exception
-     */
+    public String getNumeroAgreement() { return numeroAgreement; }
     public void setNumeroAgreement(String pNumeroAgreement) throws SaisieException {
         if (pNumeroAgreement == null || !numAgreementValide(pNumeroAgreement)) {
             throw new SaisieException("Erreur sur numéro d'agrément : " + pNumeroAgreement);
@@ -76,22 +46,12 @@ public class Medecin extends Personne {
         this.numeroAgreement = pNumeroAgreement;
     }
 
-    /**
-     * Gets patients.
-     *
-     * @return the patients
-     */
-    public List<Patient> getPatients() {
-        return patients;
-    }
+    public List<Patient> getPatients() { return patients; }
+    public void setPatients(List<Patient> patients) { this.patients = patients; }
 
-    /**
-     * Sets patients.
-     *
-     * @param patients the patients
-     */
-    public void setPatients(List<Patient> patients) {
-        this.patients = patients;
+    // Getter statique pour la liste des médecins
+    public static List<Medecin> getMedecins() {
+        return medecins;
     }
 
     @Override

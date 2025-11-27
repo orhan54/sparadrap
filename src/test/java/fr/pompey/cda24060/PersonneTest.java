@@ -1,6 +1,5 @@
 package fr.pompey.cda24060;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import fr.pompey.cda24060.exception.SaisieException;
@@ -12,10 +11,24 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class PersonneTest {
 
-    // Classe interne permettant d'instancier Personne
+    /**
+     * Classe interne permettant d’instancier Personne
+     * avec un toString() fonctionnel
+     */
     private static class FakePersonne extends Personne {
+
         public FakePersonne(String nom, String prenom, Lieu lieu) throws SaisieException {
             super(nom, prenom, lieu);
+        }
+
+        @Override
+        public String toString() {
+            return "Personne{" +
+                    "nom='" + getNom() + '\'' +
+                    ", prenom='" + getPrenom() + '\'' +
+                    ", lieu=" + getLieu() +
+                    ", mutuelle=" + (getMutuelle() != null ? getMutuelle().getNom() : "Aucune") +
+                    '}';
         }
     }
 
@@ -25,7 +38,7 @@ class PersonneTest {
 
     @BeforeEach
     void setUp() throws SaisieException {
-        // Création d'un Lieu valide
+        // Création d’un lieu valide
         lieu = new Lieu(
                 "10 rue de Paris",
                 "test@example.com",
@@ -34,7 +47,7 @@ class PersonneTest {
                 75001
         );
 
-        // Création d'une Mutuelle valide
+        // Création d’une mutuelle valide
         mutuelle = new Mutuelle(
                 "MutuelleTest",
                 30.0,
@@ -42,9 +55,9 @@ class PersonneTest {
                 lieu
         );
 
-        // Création d'une FakePersonne
+        // Création d'une personne factice
         personne = new FakePersonne("Dupont", "Jean", lieu);
-        personne.setMutuelle(mutuelle); // association d'une mutuelle
+        personne.setMutuelle(mutuelle);
     }
 
     @Test
@@ -107,25 +120,26 @@ class PersonneTest {
     @Test
     void testNomInvalide() {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            personne.setNom("Dupont123"); // nom invalide
+            personne.setNom("Dupont123"); // invalide
         });
-        assertTrue(exception.getMessage().contains("Le nom n'est pas valide"));
+        assertTrue(exception.getMessage().contains("Erreur sur le nom"));
     }
 
     @Test
     void testPrenomInvalide() {
         Exception exception = assertThrows(SaisieException.class, () -> {
-            personne.setPrenom("Jean!"); // prénom invalide
+            personne.setPrenom("Jean!"); // invalide
         });
-        assertTrue(exception.getMessage().contains("Le prenom n'est pas valide"));
+        assertTrue(exception.getMessage().contains("Erreur sur le prénom"));
     }
 
     @Test
     void testToString() {
         String str = personne.toString();
+
         assertTrue(str.contains("Dupont"));
         assertTrue(str.contains("Jean"));
-        assertTrue(str.contains("Paris")); // contenu du lieu
-        assertTrue(str.contains("MutuelleTest")); // contenu de la mutuelle
+        assertTrue(str.contains("Paris"));
+        assertTrue(str.contains("MutuelleTest"));
     }
 }

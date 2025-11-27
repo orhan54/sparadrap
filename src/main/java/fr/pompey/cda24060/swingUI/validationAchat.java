@@ -387,7 +387,6 @@ public class validationAchat extends JFrame {
                 for (Stock_Medicament medicament : stockMedicamentsList) {
                     if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
                         medicament.setMedicQuantite(medicament.getQuantite() - quantiteCommande);
-                        // TODO: Mettre à jour en BDD avec stockMedicamentDAO.update(medicament)
                         break;
                     }
                 }
@@ -475,7 +474,7 @@ public class validationAchat extends JFrame {
             for (Stock_Medicament medicament : stockMedicamentsList) {
                 tableModelMedicDispo.addRow(new Object[]{
                         medicament.getQuantite(),
-                        medicament.getDateMiseEnServiceFormatee(), // DATE FORMATÉE dd/MM/yyyy
+                        medicament.getDateMiseEnServiceFormatee(),
                         String.format("%.2f€", medicament.getMedicPrixUnitaire()),
                         medicament.getMedicNom()
                 });
