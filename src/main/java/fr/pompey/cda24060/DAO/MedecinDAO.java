@@ -1,6 +1,5 @@
 package fr.pompey.cda24060.DAO;
 
-import fr.pompey.cda24060.dataBase.Singleton;
 import fr.pompey.cda24060.exception.SaisieException;
 import fr.pompey.cda24060.model.Lieu;
 import fr.pompey.cda24060.model.Medecin;
