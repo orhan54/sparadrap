@@ -10,7 +10,7 @@ import java.util.Random;
 public class Patient extends Personne {
     // Attributs
     private int Id_Patient;
-    private String numeroSecuriteSociale;
+    private String patNumSecu;
     private Date patDateNaissance;
 
     // Formatter pour les dates au format dd/MM/yyyy
@@ -24,28 +24,28 @@ public class Patient extends Personne {
     }
 
     // Constructeur principal
-    public Patient(String nom,
-                   String prenom,
+    public Patient(String pPatNom,
+                   String pPatPrenom,
                    LocalDate dateNaissance,
                    Lieu lieu,
                    Mutuelle mutuelle,
                    Medecin medecin) throws SaisieException {
-        super(nom, prenom, lieu, mutuelle, medecin);
+        super(pPatNom, pPatPrenom, lieu, mutuelle, medecin);
         this.patDateNaissance = Date.valueOf(dateNaissance);
-        this.numeroSecuriteSociale = generateNumSecu();
+        this.patNumSecu = generateNumSecu();
     }
 
     // Constructeur alternatif pour DAO (numéro de sécu existant)
-    public Patient(String nom,
-                   String prenom,
-                   Date dateNaissance,
+    public Patient(String pPatNom,
+                   String pPatPrenom,
+                   Date pPatDateNaissance,
                    Lieu lieu,
                    Mutuelle mutuelle,
                    Medecin medecin,
-                   String numeroSecu) throws SaisieException {
-        super(nom, prenom, lieu, mutuelle, medecin);
-        this.patDateNaissance = dateNaissance;
-        this.numeroSecuriteSociale = numeroSecu;
+                   String pPatNumSecu) throws SaisieException {
+        super(pPatNom, pPatPrenom, lieu, mutuelle, medecin);
+        this.patDateNaissance = pPatDateNaissance;
+        this.patNumSecu = pPatNumSecu;
     }
 
     // Génération d'un numéro de sécurité sociale aléatoire
@@ -116,12 +116,12 @@ public class Patient extends Personne {
     /**
      * Sets date naissance depuis format dd/MM/yyyy.
      *
-     * @param dateString the date string
+     * @param pPatDateString the date string
      * @throws SaisieException the saisie exception
      */
-    public void setPatDateNaissanceFromString(String dateString) throws SaisieException {
+    public void setPatDateNaissanceFromString(String pPatDateString) throws SaisieException {
         try {
-            LocalDate date = LocalDate.parse(dateString, DATE_FORMATTER);
+            LocalDate date = LocalDate.parse(pPatDateString, DATE_FORMATTER);
             this.patDateNaissance = Date.valueOf(date);
         } catch (Exception e) {
             throw new SaisieException("Format de date invalide. Utilisez dd/MM/yyyy");
@@ -134,7 +134,7 @@ public class Patient extends Personne {
      * @return the pat nume secu
      */
     public String getPatNumeSecu() {
-        return numeroSecuriteSociale;
+        return patNumSecu;
     }
 
     /**
@@ -147,7 +147,7 @@ public class Patient extends Personne {
         if (numero == null || numero.length() != 15) {
             throw new SaisieException("Numéro de sécurité sociale invalide : " + numero);
         }
-        this.numeroSecuriteSociale = numero;
+        this.patNumSecu = numero;
     }
 
     @Override
@@ -156,7 +156,7 @@ public class Patient extends Personne {
         sb.append("Patient :\n");
         sb.append("- Nom : ").append(getNom()).append("\n");
         sb.append("- Prénom : ").append(getPrenom()).append("\n");
-        sb.append("- Numéro de Sécurité Sociale : ").append(numeroSecuriteSociale).append("\n");
+        sb.append("- Numéro de Sécurité Sociale : ").append(patNumSecu).append("\n");
         sb.append("- Date de naissance : ").append(getPatDateNaissanceFormatee()).append("\n");
 
         sb.append("\n--- Adresse ---\n");

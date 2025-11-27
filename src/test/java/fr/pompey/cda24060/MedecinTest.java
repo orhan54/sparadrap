@@ -37,13 +37,13 @@ class MedecinTest {
 
     @Test
     void testGetNumeroAgreement() {
-        assertEquals("12345678901", medecin.getNumeroAgreement());
+        assertEquals("12345678901", medecin.getMedNumeroAgreement());
     }
 
     @Test
     void testSetNumeroAgreement() throws SaisieException {
         medecin.setNumeroAgreement("98765432100");
-        assertEquals("98765432100", medecin.getNumeroAgreement());
+        assertEquals("98765432100", medecin.getMedNumeroAgreement());
     }
 
     @Test

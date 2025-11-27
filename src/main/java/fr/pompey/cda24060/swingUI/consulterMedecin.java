@@ -277,7 +277,7 @@ public class consulterMedecin extends JFrame {
                                     m.getLieu().getVille(),
                                     m.getLieu().getTelephone(),
                                     m.getLieu().getEmail(),
-                                    m.getNumeroAgreement()
+                                    m.getMedNumeroAgreement()
                             });
                         }
                     }

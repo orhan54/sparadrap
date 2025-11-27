@@ -78,7 +78,7 @@ public class registerMedecin extends JFrame {
             textFieldVille.setText(medecin.getLieu().getVille());
             textFieldTelephone.setText(medecin.getLieu().getTelephone());
             textFieldEmail.setText(medecin.getLieu().getEmail());
-            textFieldNumAgre.setText(medecin.getNumeroAgreement());
+            textFieldNumAgre.setText(medecin.getMedNumeroAgreement());
         }
 
         // Actions boutons

@@ -30,7 +30,7 @@ public class MedecinDAO extends InterfaceDAO<Medecin> {
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, medecin.getNom());
             stmt.setString(2, medecin.getPrenom());
-            stmt.setString(3, medecin.getNumeroAgreement());
+            stmt.setString(3, medecin.getMedNumeroAgreement());
             stmt.setInt(4, lieu.getId_Lieu());
 
             int affectedRows = stmt.executeUpdate();
@@ -115,7 +115,7 @@ public class MedecinDAO extends InterfaceDAO<Medecin> {
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, medecin.getNom());
             stmt.setString(2, medecin.getPrenom());
-            stmt.setString(3, medecin.getNumeroAgreement());
+            stmt.setString(3, medecin.getMedNumeroAgreement());
             stmt.setInt(4, medecin.getLieu().getId_Lieu());
             stmt.setInt(5, medecin.getId_Medecin());
 

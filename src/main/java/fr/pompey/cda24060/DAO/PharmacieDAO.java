@@ -23,8 +23,8 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
         pharmacie.setLieu(lieu);
 
         try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            stmt.setString(1, pharmacie.getNom());
-            stmt.setString(2, pharmacie.getPrenom());
+            stmt.setString(1, pharmacie.getPhaNom());
+            stmt.setString(2, pharmacie.getPhaPrenom());
             stmt.setInt(3, lieu.getId_Lieu());
 
             int rowsAffected = stmt.executeUpdate();
@@ -95,8 +95,8 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
         lieuDAO.update(pharmacie.getLieu());
 
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setString(1, pharmacie.getNom());
-            stmt.setString(2, pharmacie.getPrenom());
+            stmt.setString(1, pharmacie.getPhaNom());
+            stmt.setString(2, pharmacie.getPhaPrenom());
             stmt.setInt(3, pharmacie.getLieu().getId_Lieu());
             stmt.setInt(4, pharmacie.getId_Pharmacie());
 

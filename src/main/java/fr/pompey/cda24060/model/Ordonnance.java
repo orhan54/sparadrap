@@ -1,15 +1,18 @@
 package fr.pompey.cda24060.model;
 
+import fr.pompey.cda24060.exception.SaisieException;
+
 import java.sql.Date;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static fr.pompey.cda24060.utility.RegexUtility.regexAlpha;
+
 public class Ordonnance {
     private int Id_Ordonnance;
     private Date date;
-    private String nomMedecin;
-    private String nomPatient;
+    private String nomMedecin, nomPatient;
     private Medecin medecin;
     private Patient patient;
     private List<Stock_Medicament> medicaments;
@@ -17,11 +20,11 @@ public class Ordonnance {
     // Formatter pour les dates au format dd/MM/yyyy
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
-    public Ordonnance(Date date, String nomMedecin, String nomPatient,
-                      Medecin medecin, Patient patient) {
+    public Ordonnance(Date date, String pNomMedecin, String pNomPatient,
+                      Medecin medecin, Patient patient) throws SaisieException {
         this.date = date;
-        this.nomMedecin = nomMedecin;
-        this.nomPatient = nomPatient;
+        this.setNomMedecin(pNomMedecin);
+        this.setNomPatient(pNomPatient);
         this.medecin = medecin;
         this.patient = patient;
         this.medicaments = new ArrayList<>();
@@ -89,10 +92,14 @@ public class Ordonnance {
     /**
      * Sets nom medecin.
      *
-     * @param nomMedecin the nom medecin
+     * @param pNomMedecin the nom medecin
      */
-    public void setNomMedecin(String nomMedecin) {
-        this.nomMedecin = nomMedecin;
+    public void setNomMedecin(String pNomMedecin) throws SaisieException {
+        if(!regexAlpha(pNomMedecin)) {
+            throw new SaisieException("Erreur sur le nom du medecin : ");
+        } else {
+            this.nomMedecin = pNomMedecin;
+        }
     }
 
     /**
@@ -107,10 +114,14 @@ public class Ordonnance {
     /**
      * Sets nom patient.
      *
-     * @param nomPatient the nom patient
+     * @param pNomPatient the nom patient
      */
-    public void setNomPatient(String nomPatient) {
-        this.nomPatient = nomPatient;
+    public void setNomPatient(String pNomPatient) throws SaisieException {
+        if(!regexAlpha(pNomPatient)) {
+            throw new SaisieException("Erreur sur le nom du patient : ");
+        } else {
+            this.nomPatient = pNomPatient;
+        }
     }
 
     /**

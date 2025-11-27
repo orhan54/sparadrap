@@ -10,7 +10,7 @@ import static fr.pompey.cda24060.utility.RegexUtility.numAgreementValide;
 public class Medecin extends Personne {
 
     private int Id_Medecin;
-    private String numeroAgreement;
+    private String medNumeroAgreement;
     private List<Patient> patients = new ArrayList<>();
 
     // Liste statique pour tous les médecins
@@ -26,15 +26,15 @@ public class Medecin extends Personne {
     /**
      * Constructeur principal
      *
-     * @param pNom             the p nom
-     * @param pPrenom          the p prenom
-     * @param pNumeroAgreement the p numero agreement
+     * @param pMedNom             the p nom
+     * @param pMedPrenom          the p prenom
+     * @param pMedNumeroAgreement the p numero agreement
      * @param lieu             the lieu
      * @throws SaisieException the saisie exception
      */
-    public Medecin(String pNom, String pPrenom, String pNumeroAgreement, Lieu lieu) throws SaisieException {
-        super(pNom, pPrenom, lieu);
-        this.setNumeroAgreement(pNumeroAgreement);
+    public Medecin(String pMedNom, String pMedPrenom, String pMedNumeroAgreement, Lieu lieu) throws SaisieException {
+        super(pMedNom, pMedPrenom, lieu);
+        this.setNumeroAgreement(pMedNumeroAgreement);
 
         // Ajouter ce médecin à la liste statique
         medecins.add(this);
@@ -70,19 +70,19 @@ public class Medecin extends Personne {
      *
      * @return the numero agreement
      */
-    public String getNumeroAgreement() { return numeroAgreement; }
+    public String getMedNumeroAgreement() { return medNumeroAgreement; }
 
     /**
      * Sets numero agreement.
      *
-     * @param pNumeroAgreement the p numero agreement
+     * @param pMedNumeroAgreement the p numero agreement
      * @throws SaisieException the saisie exception
      */
-    public void setNumeroAgreement(String pNumeroAgreement) throws SaisieException {
-        if (pNumeroAgreement == null || !numAgreementValide(pNumeroAgreement)) {
-            throw new SaisieException("Erreur sur numéro d'agrément : " + pNumeroAgreement);
+    public void setNumeroAgreement(String pMedNumeroAgreement) throws SaisieException {
+        if (pMedNumeroAgreement == null || !numAgreementValide(pMedNumeroAgreement)) {
+            throw new SaisieException("Erreur sur numéro d'agrément : " + pMedNumeroAgreement);
         }
-        this.numeroAgreement = pNumeroAgreement;
+        this.medNumeroAgreement = pMedNumeroAgreement;
     }
 
     /**
@@ -105,7 +105,7 @@ public class Medecin extends Personne {
         sb.append("Médecin :\n");
         sb.append("- Nom : ").append(getNom()).append("\n");
         sb.append("- Prénom : ").append(getPrenom()).append("\n");
-        sb.append("- Numéro d'agrément : ").append(numeroAgreement).append("\n");
+        sb.append("- Numéro d'agrément : ").append(medNumeroAgreement).append("\n");
         if (getLieu() != null) {
             sb.append(getLieu().toString());
         }
