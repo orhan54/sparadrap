@@ -100,7 +100,7 @@ public class validationAchat extends JFrame {
         }
 
         // Tableaux pour les medicaments disponibles
-        String[] colonne = {"Quantité", "Date mise en service", "Prix", "Nom"};
+        String[] colonne = {"Quantité", "Date mise en service", "Prix", "Nom medicament"};
         tableModelMedicDispo = new DefaultTableModel(colonne, 0);
         tableMedicDispo.setModel(tableModelMedicDispo);
 
