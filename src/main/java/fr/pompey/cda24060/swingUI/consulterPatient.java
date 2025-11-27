@@ -156,7 +156,7 @@ public class consulterPatient extends JFrame {
                                         p.getLieu().getEmail(),
                                         p.getPatNumeSecu(),
                                         p.getPatDateNaissanceFormatee(), // DATE FORMATÉE dd/MM/yyyy
-                                        p.getMutuelle() != null ? p.getMutuelle().getNom() : "",
+                                        p.getMutuelle() != null ? p.getMutuelle().getMutNom() : "",
                                         p.getMedecin() != null ? p.getMedecin().getNom() + " " + p.getMedecin().getPrenom() : ""
                                 });
                             }

@@ -27,7 +27,7 @@ class PersonneTest {
                     "nom='" + getNom() + '\'' +
                     ", prenom='" + getPrenom() + '\'' +
                     ", lieu=" + getLieu() +
-                    ", mutuelle=" + (getMutuelle() != null ? getMutuelle().getNom() : "Aucune") +
+                    ", mutuelle=" + (getMutuelle() != null ? getMutuelle().getMutNom() : "Aucune") +
                     '}';
         }
     }

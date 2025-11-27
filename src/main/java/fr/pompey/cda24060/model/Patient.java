@@ -168,7 +168,7 @@ public class Patient extends Personne {
 
         sb.append("\n--- Mutuelle ---\n");
         if (getMutuelle() != null) {
-            sb.append("- Mutuelle : ").append(getMutuelle().getNom()).append("\n");
+            sb.append("- Mutuelle : ").append(getMutuelle().getMutNom()).append("\n");
         } else {
             sb.append("Aucune mutuelle enregistrée\n");
         }

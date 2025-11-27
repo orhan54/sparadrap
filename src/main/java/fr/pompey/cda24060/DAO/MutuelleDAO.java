@@ -18,8 +18,8 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
         sql.toString();
 
         try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, mutuelle.getNom());
-            ps.setDouble(2, mutuelle.getTauxPriseEnCharge());
+            ps.setString(1, mutuelle.getMutNom());
+            ps.setDouble(2, mutuelle.getMutTauxPriseEnCharge());
             ps.setInt(3, mutuelle.getMutNumDepartement());
             ps.setInt(4, mutuelle.getLieu().getId_Lieu());
 
@@ -86,8 +86,8 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
         sql.toString();
 
         try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
-            ps.setString(1, mutuelle.getNom());
-            ps.setDouble(2, mutuelle.getTauxPriseEnCharge());
+            ps.setString(1, mutuelle.getMutNom());
+            ps.setDouble(2, mutuelle.getMutTauxPriseEnCharge());
             ps.setInt(3, mutuelle.getMutNumDepartement());
             ps.setInt(4, mutuelle.getLieu().getId_Lieu());
             ps.setInt(5, mutuelle.getId_Mutuelle());

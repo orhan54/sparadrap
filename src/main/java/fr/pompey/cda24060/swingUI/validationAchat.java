@@ -209,7 +209,7 @@ public class validationAchat extends JFrame {
 
         if (mutuellesList != null) {
             for (Mutuelle mutuelle : mutuellesList) {
-                String item = mutuelle.getNom() + " (" + mutuelle.getTauxPriseEnCharge() + "%)";
+                String item = mutuelle.getMutNom() + " (" + mutuelle.getMutTauxPriseEnCharge() + "%)";
                 comboBoxMutuelle.addItem(item);
             }
         }

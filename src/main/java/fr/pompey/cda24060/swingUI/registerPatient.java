@@ -127,7 +127,7 @@ public class registerPatient extends JFrame {
 
             // Sélectionner la mutuelle
             if (patient.getMutuelle() != null) {
-                comboBoxMutuelle.setSelectedItem(patient.getMutuelle().getNom());
+                comboBoxMutuelle.setSelectedItem(patient.getMutuelle().getMutNom());
             }
 
             // Sélectionner le médecin
@@ -218,7 +218,7 @@ public class registerPatient extends JFrame {
 
         if (mutuelles != null) {
             for (Mutuelle mut : mutuelles) {
-                comboBoxMutuelle.addItem(mut.getNom());
+                comboBoxMutuelle.addItem(mut.getMutNom());
             }
         }
     }
@@ -304,7 +304,7 @@ public class registerPatient extends JFrame {
 
             Mutuelle mutuelleChoisie = null;
             for (Mutuelle m : mutuelles) {
-                if (m.getNom().equals(mutuelleNom)) {
+                if (m.getMutNom().equals(mutuelleNom)) {
                     mutuelleChoisie = m;
                     break;
                 }
