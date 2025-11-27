@@ -14,9 +14,11 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
 
     @Override
     public Ordonnance create(Ordonnance ordonnance) throws SQLException {
-        String sql = "INSERT INTO Ordonnance (ordo_date, ordo_nom_medecin, ordo_nom_patient, Id_Medecin, Id_Patient) VALUES (?, ?, ?, ?, ?)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO Ordonnance (ordo_date, ordo_nom_medecin, ordo_nom_patient, Id_Medecin, Id_Patient) VALUES (?, ?, ?, ?, ?)");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
             stmt.setDate(1, ordonnance.getDate());
             stmt.setString(2, ordonnance.getNomMedecin());
             stmt.setString(3, ordonnance.getNomPatient());
@@ -42,13 +44,15 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
 
     @Override
     public Ordonnance getById(int id) throws SQLException, SaisieException {
-        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
-                "FROM Ordonnance o " +
-                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
-                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient " +
-                "WHERE o.Id_Ordonnance = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom ");
+        sql.append("FROM Ordonnance o ");
+        sql.append("LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin ");
+        sql.append("LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient ");
+        sql.append("WHERE o.id_Ordonnance = ?");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -62,13 +66,15 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
     @Override
     public List<Ordonnance> getAll() throws SQLException {
         List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
-                "FROM Ordonnance o " +
-                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
-                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom ");
+        sql.append("FROM Ordonnance o ");
+        sql.append("LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin ");
+        sql.append("LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient");
+        sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 ordonnances.add(extractOrdonnanceFromResultSet(rs));
@@ -84,13 +90,16 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
      */
     public List<Ordonnance> getByNomMedecin(String nomMedecin) throws SQLException {
         List<Ordonnance> ordonnances = new ArrayList<>();
-        String sql = "SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom " +
-                "FROM Ordonnance o " +
-                "LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin " +
-                "LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient " +
-                "WHERE o.ordo_nom_medecin = ?";
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT o.*, m.med_nom, m.med_prenom, p.pat_nom, p.pat_prenom ");
+        sql.append("FROM Ordonnance o ");
+        sql.append("LEFT JOIN Medecin m ON o.Id_Medecin = m.Id_Medecin ");
+        sql.append("LEFT JOIN Patient p ON o.Id_Patient = p.Id_Patient ");
+        sql.append("WHERE o.ordo_nom_medecin = ?");
+        sql.toString();
+
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setString(1, nomMedecin);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -105,10 +114,12 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
 
     @Override
     public boolean update(Ordonnance ordonnance) throws SQLException {
-        String sql = "UPDATE Ordonnance SET ordo_date = ?, ordo_nom_medecin = ?, ordo_nom_patient = ?, " +
-                "Id_Medecin = ?, Id_Patient = ? WHERE Id_Ordonnance = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Ordonnance SET ordo_date = ?, ordo_nom_medecin = ?, ordo_nom_patient = ?, ");
+        sql.append("Id_Medecin = ?, Id_Patient = ? WHERE Id_Ordonnance = ?");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setDate(1, ordonnance.getDate());
             stmt.setString(2, ordonnance.getNomMedecin());
             stmt.setString(3, ordonnance.getNomPatient());
@@ -123,12 +134,56 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
 
     @Override
     public boolean delete(int id) throws SQLException {
-        String sql = "DELETE FROM Ordonnance WHERE Id_Ordonnance = ?";
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM Ordonnance WHERE Id_Ordonnance = ?");
+        sql.toString();
+
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;
         }
+    }
+
+    /**
+     * Récupère les médicaments d'une ordonnance
+     */
+    public List<Stock_Medicament> getMedicamentsByOrdonnance(int idOrdonnance) throws SQLException {
+        List<Stock_Medicament> medicaments = new ArrayList<>();
+
+        // Si vous avez une table de liaison ordonnance_medicament
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT sm.* FROM Stock_Medicament AS sm ");
+        sql.append("INNER JOIN ordonnance_medicament AS om ON sm.Id_Stock_Medicament = om.Id_Stock_Medicament ");
+        sql.append("WHERE om.Id_Ordonnance = ?");
+        sql.toString();
+
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
+            stmt.setInt(1, idOrdonnance);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    // Créer un médicament basique
+                    Stock_Medicament medicament = new Stock_Medicament(
+                            rs.getString("medic_nom"),
+                            rs.getInt("medic_quantite"),
+                            rs.getDate("medic_date_mise_en_service"),
+                            rs.getDate("medic_date_entree_stock"),
+                            rs.getDouble("medic_prix_unitaire")
+                    );
+                    medicament.setId_Stock_Medicament(rs.getInt("Id_Stock_Medicament"));
+                    medicaments.add(medicament);
+                }
+            }
+        } catch (SaisieException e) {
+            throw new SQLException("Erreur lors de la récupération des médicaments : " + e.getMessage());
+        }
+
+        return medicaments;
+    }
+
+    @Override
+    public void closeConnection() throws SQLException {
+        super.closeConnection();
     }
 
     /**
@@ -161,44 +216,5 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
         // ordonnance.setMedicaments(getMedicamentsByOrdonnance(ordonnance.getId_Ordonnance()));
 
         return ordonnance;
-    }
-
-    /**
-     * Récupère les médicaments d'une ordonnance (optionnel, si vous avez une table de liaison)
-     */
-    public List<Stock_Medicament> getMedicamentsByOrdonnance(int idOrdonnance) throws SQLException {
-        List<Stock_Medicament> medicaments = new ArrayList<>();
-
-        // Si vous avez une table de liaison ordonnance_medicament
-        String sql = "SELECT sm.* FROM Stock_Medicament sm " +
-                "INNER JOIN ordonnance_medicament om ON sm.Id_Stock_Medicament = om.Id_Stock_Medicament " +
-                "WHERE om.Id_Ordonnance = ?";
-
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
-            stmt.setInt(1, idOrdonnance);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    // Créer un médicament basique
-                    Stock_Medicament medicament = new Stock_Medicament(
-                            rs.getString("medic_nom"),
-                            rs.getInt("medic_quantite"),
-                            rs.getDate("medic_date_mise_en_service"),
-                            rs.getDate("medic_date_entree_stock"),
-                            rs.getDouble("medic_prix_unitaire")
-                    );
-                    medicament.setId_Stock_Medicament(rs.getInt("Id_Stock_Medicament"));
-                    medicaments.add(medicament);
-                }
-            }
-        } catch (SaisieException e) {
-            throw new SQLException("Erreur lors de la récupération des médicaments : " + e.getMessage());
-        }
-
-        return medicaments;
-    }
-
-    @Override
-    public void closeConnection() throws SQLException {
-        super.closeConnection();
     }
 }

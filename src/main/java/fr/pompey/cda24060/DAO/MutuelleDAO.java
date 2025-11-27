@@ -13,9 +13,11 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
 
     @Override
     public Mutuelle create(Mutuelle mutuelle) throws SQLException {
-        String query = "INSERT INTO Mutuelle (mut_nom, mut_taux_prise_en_charge, mut_num_departement, Id_Lieu) VALUES (?, ?, ?, ?)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO Mutuelle (mut_nom, mut_taux_prise_en_charge, mut_num_departement, Id_Lieu) VALUES (?, ?, ?, ?)");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, mutuelle.getNom());
             ps.setDouble(2, mutuelle.getTauxPriseEnCharge());
             ps.setInt(3, mutuelle.getMutNumDepartement());
@@ -36,11 +38,13 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
 
     @Override
     public Mutuelle getById(int id) throws SQLException {
-        String query = "SELECT m.*, l.* FROM Mutuelle m " +
-                "JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu " +
-                "WHERE m.Id_Mutuelle = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT m.*, l.* FROM Mutuelle m ");
+        sql.append("JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu ");
+        sql.append("WHERE m.Id_Mutuelle = ?");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -57,11 +61,13 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
     @Override
     public List<Mutuelle> getAll() throws SQLException {
         List<Mutuelle> mutuelles = new ArrayList<>();
-        String query = "SELECT m.*, l.* FROM Mutuelle m " +
-                "JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT m.*, l.* FROM Mutuelle m ");
+        sql.append("JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu");
+        sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 mutuelles.add(extractMutuelleFromResultSet(rs));
@@ -74,10 +80,12 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
 
     @Override
     public boolean update(Mutuelle mutuelle) throws SQLException {
-        String query = "UPDATE Mutuelle SET mut_nom = ?, mut_taux_prise_en_charge = ?, " +
-                "mut_num_departement = ?, Id_Lieu = ? WHERE Id_Mutuelle = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Mutuelle SET mut_nom = ?, mut_taux_prise_en_charge = ?, ");
+        sql.append("mut_num_departement = ?, Id_Lieu = ? WHERE Id_Mutuelle = ?");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setString(1, mutuelle.getNom());
             ps.setDouble(2, mutuelle.getTauxPriseEnCharge());
             ps.setInt(3, mutuelle.getMutNumDepartement());
@@ -90,9 +98,11 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
 
     @Override
     public boolean delete(int id) throws SQLException {
-        String query = "DELETE FROM Mutuelle WHERE Id_Mutuelle = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM Mutuelle WHERE Id_Mutuelle = ?");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
         }
@@ -106,11 +116,13 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
      */
     public List<Mutuelle> getByDepartement(int numDepartement) throws SQLException {
         List<Mutuelle> mutuelles = new ArrayList<>();
-        String query = "SELECT m.*, l.* FROM Mutuelle m " +
-                "JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu " +
-                "WHERE m.mut_num_departement = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT m.*, l.* FROM Mutuelle m ");
+        sql.append("JOIN Lieu l ON m.Id_Lieu = l.Id_Lieu ");
+        sql.append("WHERE m.mut_num_departement = ?");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setInt(1, numDepartement);
 
             try (ResultSet rs = ps.executeQuery()) {

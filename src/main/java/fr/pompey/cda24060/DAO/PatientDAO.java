@@ -17,14 +17,16 @@ public class PatientDAO extends InterfaceDAO<Patient> {
 
     @Override
     public Patient create(Patient patient) throws SQLException {
-        String sql = "INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO Patient (pat_nom, pat_prenom, pat_num_secu, pat_date_naissance, Id_Lieu, Id_Mutuelle, Id_Medecin) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        sql.toString();
 
         // Créer d'abord le lieu
         LieuDAO lieuDAO = new LieuDAO();
         Lieu lieu = lieuDAO.create(patient.getLieu());
         patient.setLieu(lieu);
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, patient.getNom());
             stmt.setString(2, patient.getPrenom());
             stmt.setString(3, patient.getPatNumeSecu());
@@ -52,14 +54,16 @@ public class PatientDAO extends InterfaceDAO<Patient> {
 
     @Override
     public Patient getById(int id) throws SQLException {
-        String query = "SELECT p.*, l.*, mut.*, m.* " +
-                "FROM Patient p " +
-                "JOIN Lieu l ON p.Id_Lieu = l.Id_Lieu " +
-                "JOIN Mutuelle mut ON p.Id_Mutuelle = mut.Id_Mutuelle " +
-                "LEFT JOIN Medecin m ON p.Id_Medecin = m.Id_Medecin " +
-                "WHERE p.Id_Patient = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT p.*, l.*, mut.*, m.* ");
+        sql.append("FROM Patient AS p ");
+        sql.append("JOIN Lieu AS l ON p.Id_Lieu = l.Id_Lieu ");
+        sql.append("JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle ");
+        sql.append("LEFT JOIN Medecin AS m ON p.Id_Medecin = m.Id_Medecin ");
+        sql.append("WHERE p.Id_Patient = ?");
+        sql.toString();
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setInt(1, id);
 
             try (ResultSet rs = ps.executeQuery()) {
@@ -76,14 +80,16 @@ public class PatientDAO extends InterfaceDAO<Patient> {
     @Override
     public List<Patient> getAll() throws SQLException {
         List<Patient> patients = new ArrayList<>();
-        String sql = "SELECT p.*, l.*, mut.*, m.* " +
-                "FROM Patient AS p " +
-                "JOIN Lieu AS l ON p.Id_Lieu = l.Id_Lieu " +
-                "JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle " +
-                "JOIN Medecin AS m ON p.Id_Medecin = m.Id_Medecin";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT p.*, l.*, mut.*, m.* " );
+        sql.append("FROM Patient AS p ");
+        sql.append("JOIN Lieu AS l ON p.Id_Lieu = l.Id_Lieu ");
+        sql.append("JOIN Mutuelle AS mut ON p.Id_Mutuelle = mut.Id_Mutuelle ");
+        sql.append("JOIN Medecin AS m ON p.Id_Medecin = m.Id_Medecin");
+        sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 patients.add(extractPatientFromResultSet(rs));
@@ -96,14 +102,16 @@ public class PatientDAO extends InterfaceDAO<Patient> {
 
     @Override
     public boolean update(Patient patient) throws SQLException {
-        String query = "UPDATE Patient SET pat_nom = ?, pat_prenom = ?, pat_num_secu = ?, " +
-                "pat_date_naissance = ?, Id_Lieu = ?, Id_Mutuelle = ?, Id_Medecin = ? WHERE Id_Patient = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Patient SET pat_nom = ?, pat_prenom = ?, pat_num_secu = ?, ");
+        sql.append("pat_date_naissance = ?, Id_Lieu = ?, Id_Mutuelle = ?, Id_Medecin = ? WHERE Id_Patient = ?");
+        sql.toString();
 
         // Mettre à jour d'abord le lieu
         LieuDAO lieuDAO = new LieuDAO();
         lieuDAO.update(patient.getLieu());
 
-        try (PreparedStatement ps = connection.prepareStatement(query)) {
+        try (PreparedStatement ps = connection.prepareStatement(String.valueOf(sql))) {
             ps.setString(1, patient.getNom());
             ps.setString(2, patient.getPrenom());
             ps.setString(3, patient.getPatNumeSecu());
@@ -129,10 +137,12 @@ public class PatientDAO extends InterfaceDAO<Patient> {
             conn.setAutoCommit(false); // Démarrer une transaction
 
             // 1. Récupérer l'Id_Lieu du patient avant suppression
-            String getLieuQuery = "SELECT Id_Lieu FROM Patient WHERE Id_Patient = ?";
+            StringBuilder getLieuQuery = new StringBuilder();
+            getLieuQuery.append("SELECT Id_Lieu FROM Patient WHERE Id_Patient = ?");
+            getLieuQuery.toString();
             int idLieu = 0;
 
-            try (PreparedStatement ps = conn.prepareStatement(getLieuQuery)) {
+            try (PreparedStatement ps = conn.prepareStatement(String.valueOf(getLieuQuery))) {
                 ps.setInt(1, id);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
@@ -145,8 +155,11 @@ public class PatientDAO extends InterfaceDAO<Patient> {
             }
 
             // 2. Supprimer le patient (Id_Mutuelle sera mis à NULL automatiquement)
-            String deletePatientQuery = "DELETE FROM Patient WHERE Id_Patient = ?";
-            try (PreparedStatement ps = conn.prepareStatement(deletePatientQuery)) {
+            StringBuilder deletePatientQuery = new StringBuilder();
+            deletePatientQuery.append("DELETE FROM Patient WHERE Id_Patient = ?");
+            deletePatientQuery.toString();
+
+            try (PreparedStatement ps = conn.prepareStatement(String.valueOf(deletePatientQuery))) {
                 ps.setInt(1, id);
                 int rowsAffected = ps.executeUpdate();
 
@@ -157,8 +170,11 @@ public class PatientDAO extends InterfaceDAO<Patient> {
             }
 
             // 3. Supprimer le lieu associé
-            String deleteLieuQuery = "DELETE FROM Lieu WHERE Id_Lieu = ?";
-            try (PreparedStatement ps = conn.prepareStatement(deleteLieuQuery)) {
+            StringBuilder deleteLieuQuery = new StringBuilder();
+            deleteLieuQuery.append("DELETE FROM Lieu WHERE Id_Lieu = ?");
+            deleteLieuQuery.toString();
+
+            try (PreparedStatement ps = conn.prepareStatement(String.valueOf(deleteLieuQuery))) {
                 ps.setInt(1, idLieu);
                 ps.executeUpdate();
             }

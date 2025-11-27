@@ -15,14 +15,16 @@ import java.util.List;
 public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
     @Override
     public Pharmacie create(Pharmacie pharmacie) throws SQLException, IOException, ClassNotFoundException {
-        String sql = "INSERT INTO Pharmaci (pha_nom, pha_prenom, Id_Lieu) VALUES (?, ?, ?)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO Pharmaci (pha_nom, pha_prenom, Id_Lieu) VALUES (?, ?, ?)");
+        sql.toString();
 
         // Créer d'abord le lieu
         LieuDAO lieuDAO = new LieuDAO();
         Lieu lieu = lieuDAO.create(pharmacie.getLieu());
         pharmacie.setLieu(lieu);
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, pharmacie.getPhaNom());
             stmt.setString(2, pharmacie.getPhaPrenom());
             stmt.setInt(3, lieu.getId_Lieu());
@@ -46,13 +48,14 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
 
     @Override
     public Pharmacie getById(int id) throws SQLException, SaisieException {
-        String sql = "SELECT p.Id_Pharmacie, p.pha_nom, p.pha_prenom " +
-                "l.Id_Lieu, l.lieu_adresse, l.lieu_email, l.lieu_telephone, l.lieu_ville, l.lieu_cp " +
-                "FROM Pharmacie AS p " +
-                "INNER JOIN Lieu AS l ON l.Id_Lieu = p.Id_lieu " +
-                "WHERE p.Id_Pharmacie = ? ";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT p.Id_Pharmacie, p.pha_nom, p.pha_prenom ");
+        sql.append("l.Id_Lieu, l.lieu_adresse, l.lieu_email, l.lieu_telephone, l.lieu_ville, l.lieu_cp ");
+        sql.append("FROM Pharmacie AS p ");
+        sql.append("INNER JOIN Lieu AS l ON l.Id_Lieu = p.Id_lieu ");
+        sql.append("WHERE p.Id_Pharmacie = ? ");
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -69,17 +72,19 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
     @Override
     public List<Pharmacie> getAll() throws SQLException {
         List<Pharmacie> pharmacies = new ArrayList<>();
-        String sql = "SELECT p.Id_Pharmacie, p.pha_nom, p.pha_prenom " +
-                "l.Id_Lieu, l.lieu_adresse, l.lieu_email, l.lieu_telephone, l.lieu_ville, l.lieu_cp " +
-                "FROM Pharmacie AS p " +
-                "INNER JOIN Lieu AS l ON l.Id_Lieu = p.Id_lieu " +
-                "Order BY p.pha_nom, p.pha_prenom";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT p.Id_Pharmacie, p.pha_nom, p.pha_prenom ");
+        sql.append("l.Id_Lieu, l.lieu_adresse, l.lieu_email, l.lieu_telephone, l.lieu_ville, l.lieu_cp ");
+        sql.append("FROM Pharmacie AS p ");
+        sql.append("INNER JOIN Lieu AS l ON l.Id_Lieu = p.Id_lieu ");
+        sql.append("Order BY p.pha_nom, p.pha_prenom");
+        sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
-                pharmacies.add((Pharmacie) stmt.executeQuery(sql));
+                pharmacies.add((Pharmacie) stmt.executeQuery(String.valueOf(sql)));
             }
         }
 
@@ -88,13 +93,15 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
 
     @Override
     public boolean update(Pharmacie pharmacie) throws SQLException {
-        String sql = "UPDATE Pharmacie SET pha_nom = ?, pha_prenom = ? , Id_Lieu = ? WHERE Id_Pharmacie = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Pharmacie SET pha_nom = ?, pha_prenom = ? , Id_Lieu = ? WHERE Id_Pharmacie = ?");
+        sql.toString();
 
         // Mettre à jour d'abord le lieu
         LieuDAO lieuDAO = new LieuDAO();
         lieuDAO.update(pharmacie.getLieu());
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setString(1, pharmacie.getPhaNom());
             stmt.setString(2, pharmacie.getPhaPrenom());
             stmt.setInt(3, pharmacie.getLieu().getId_Lieu());
@@ -115,16 +122,21 @@ public class PharmacieDAO extends InterfaceDAO<Pharmacie> {
         int idLieu = pharmacie.getLieu().getId_Lieu();
 
         // Supprimer le pharmacien
-        String sqlPha = "DELETE FROM Pharmacie WHERE Id_Pharmacie = ? ";
-        try (PreparedStatement stmtPha = connection.prepareStatement(sqlPha)) {
+        StringBuilder sqlPha = new StringBuilder();
+        sqlPha.append("DELETE FROM Pharmacie WHERE Id_Pharmacie = ? ");
+        sqlPha.toString();
+
+        try (PreparedStatement stmtPha = connection.prepareStatement(String.valueOf(sqlPha))) {
             stmtPha.setInt(1, id);
             int affectedRows = stmtPha.executeUpdate();
             if(affectedRows == 0) return false;
         }
 
         // Supprimer le lieu
-        String sqlLieu = "DELETE FROM Lieu WHERE Id_Lieu = ? ";
-        try (PreparedStatement stmtLieu = connection.prepareStatement(sqlLieu)) {
+        StringBuilder sqlLieu = new StringBuilder();
+        sqlLieu.append("DELETE FROM Lieu WHERE Id_Lieu = ? ");
+
+        try (PreparedStatement stmtLieu = connection.prepareStatement(String.valueOf(sqlLieu))) {
             stmtLieu.setInt(1, id);
             stmtLieu.executeUpdate();
         }

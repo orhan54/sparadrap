@@ -113,10 +113,6 @@ public class Stock_MedicamentDAO extends InterfaceDAO<Stock_Medicament> {
         sql.append("WHERE Id_Stock_Medicament = ?");
         sql.toString();
 
-        // Mettre à jour d'abord le pharmacien
-        PharmacieDAO pharmacieDAO = new PharmacieDAO();
-        pharmacieDAO.update(Stock_Medicament.getPharmacie());
-
         // Ensuite mettre à jour le stock medicament
         try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setString(1, Stock_Medicament.getMedicNom());

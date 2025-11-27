@@ -93,9 +93,11 @@ public class LieuDAO extends InterfaceDAO<Lieu> {
      */
     @Override
     public boolean update(Lieu lieu) throws SQLException {
-        String sql = "UPDATE Lieu SET lieu_adresse = ?, lieu_email = ?, lieu_telephone = ?, lieu_ville = ?, lieu_cp = ? WHERE Id_Lieu = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Lieu SET lieu_adresse = ?, lieu_email = ?, lieu_telephone = ?, lieu_ville = ?, lieu_cp = ? WHERE Id_Lieu = ?");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setString(1, lieu.getAdresse());
             stmt.setString(2, lieu.getEmail());
             stmt.setString(3, lieu.getTelephone());
@@ -113,9 +115,11 @@ public class LieuDAO extends InterfaceDAO<Lieu> {
      */
     @Override
     public boolean delete(int id) throws SQLException {
-        String sql = "DELETE FROM Lieu WHERE Id_Lieu = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("DELETE FROM Lieu WHERE Id_Lieu = ?");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setInt(1, id);
             int affectedRows = stmt.executeUpdate();
             return affectedRows > 0;

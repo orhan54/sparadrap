@@ -386,7 +386,23 @@ public class validationAchat extends JFrame {
             if (stockMedicamentsList != null) {
                 for (Stock_Medicament medicament : stockMedicamentsList) {
                     if (medicament.getMedicNom().equalsIgnoreCase(medCommande.getMedicNom())) {
-                        medicament.setMedicQuantite(medicament.getQuantite() - quantiteCommande);
+                        try {
+                            medicament.setMedicQuantite(medicament.getQuantite() - quantiteCommande);
+
+                            boolean updateSucess = stockMedicamentDAO.update(medicament);
+
+                            if (updateSucess) {
+                                System.out.println("Stocke médicament mis a jour " + medicament.getMedicNom());
+                            } else {
+                                throw new SQLException("Ma mise a jour a échouer");
+                            }
+                        } catch (SQLException | SaisieException e) {
+                            JOptionPane.showMessageDialog(this,
+                                    "Erreur sur la mise à jour du stock : " + e.getMessage(),
+                                    "Erreur", JOptionPane.ERROR_MESSAGE);
+                            e.printStackTrace();
+                            return;
+                        }
                         break;
                     }
                 }
