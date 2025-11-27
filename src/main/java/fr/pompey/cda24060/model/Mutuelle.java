@@ -24,11 +24,11 @@ public class Mutuelle {
      *
      * @param pMutNom               the nom mutuelle
      * @param pMutTauxPriseEnCharge the taux prise en charge
-     * @param pMutNumDepartement       the departement
-     * @param lieu               the Lieu lieu
-     * @throws SaisieException   the saisie exception
+     * @param pMutNumDepartement    the departement
+     * @param lieu                  the Lieu lieu
+     * @throws SaisieException the saisie exception
      */
-    // Constucteur qui extends de la classe Lieu
+// Constucteur qui extends de la classe Lieu
     public Mutuelle(String pMutNom, double pMutTauxPriseEnCharge, int pMutNumDepartement, Lieu lieu) throws SaisieException {
         this.setMutNom(pMutNom);
         this.setMutTauxPriseEnCharge(pMutTauxPriseEnCharge);

@@ -379,7 +379,7 @@ public class Commande {
      * @return the taux mutuelle
      */
     public double getComTauxPriseEnCharge() {
-        if (mutuelle != null) return mutuelle.getTauxPriseEnCharge() / 100.0;
+        if (mutuelle != null) return mutuelle.getMutTauxPriseEnCharge() / 100.0;
         return 0.0;
     }
 
@@ -443,8 +443,8 @@ public class Commande {
         if (typeAchat == TypeAchat.ORDONNANCE) {
             sb.append("- Prise en charge mutuelle : ").append(mutTauxPriseEnCharge ? "Oui" : "Non").append('\n');
             if (mutTauxPriseEnCharge && mutuelle != null) {
-                sb.append("- Mutuelle : ").append(mutuelle.getNom()).append('\n');
-                sb.append("- Taux de prise en charge : ").append(String.format("%.1f", mutuelle.getTauxPriseEnCharge())).append("%").append('\n');
+                sb.append("- Mutuelle : ").append(mutuelle.getMutNom()).append('\n');
+                sb.append("- Taux de prise en charge : ").append(String.format("%.1f", mutuelle.getMutTauxPriseEnCharge())).append("%").append('\n');
                 sb.append("- Déduction mutuelle : ").append(String.format("%.2f", getMontantDeductionMutuelle())).append("€").append('\n');
                 sb.append("- Prix à payer : ").append(String.format("%.2f", getPrixTotalApresDeduction())).append("€").append('\n');
             }
