@@ -12,7 +12,7 @@ public class Mutuelle {
 
     // Attribut de la classe Mutuelle
     private String mutNom;
-    private double tauxPriseEnCharge;
+    private double mutTauxPriseEnCharge;
     private int Id_Mutuelle ,mutNumDepartement;
     private Lieu lieu;
 
@@ -23,16 +23,16 @@ public class Mutuelle {
      * Instantiates a new Mutuelle.
      *
      * @param pMutNom               the nom mutuelle
-     * @param pTauxPriseEnCharge the taux prise en charge
-     * @param pNumDepartement       the departement
+     * @param pMutTauxPriseEnCharge the taux prise en charge
+     * @param pMutNumDepartement       the departement
      * @param lieu               the Lieu lieu
      * @throws SaisieException   the saisie exception
      */
     // Constucteur qui extends de la classe Lieu
-    public Mutuelle(String pMutNom, double pTauxPriseEnCharge, int pNumDepartement, Lieu lieu) throws SaisieException {
+    public Mutuelle(String pMutNom, double pMutTauxPriseEnCharge, int pMutNumDepartement, Lieu lieu) throws SaisieException {
         this.setMutNom(pMutNom);
-        this.setTauxPriseEnCharge(pTauxPriseEnCharge);
-        this.setMutNumDepartement(pNumDepartement);
+        this.setMutTauxPriseEnCharge(pMutTauxPriseEnCharge);
+        this.setMutNumDepartement(pMutNumDepartement);
         this.setLieu(lieu);
     }
 
@@ -71,7 +71,7 @@ public class Mutuelle {
      *
      * @return the nom mutuelle
      */
-    public  String getNom() {
+    public  String getMutNom() {
         return this.mutNom;
     }
 
@@ -94,21 +94,21 @@ public class Mutuelle {
      *
      * @return the taux prise en charge
      */
-    public double getTauxPriseEnCharge() {
-        return this.tauxPriseEnCharge;
+    public double getMutTauxPriseEnCharge() {
+        return this.mutTauxPriseEnCharge;
     }
 
     /**
      * Sets taux prise en charge.
      *
-     * @param pTauxPriseEnCharge the taux prise en charge
+     * @param pMutTauxPriseEnCharge the taux prise en charge
      * @throws SaisieException the saisie exception
      */
-    public void setTauxPriseEnCharge(double pTauxPriseEnCharge) throws SaisieException {
-        if (!positifInt(String.valueOf(pTauxPriseEnCharge)) && pTauxPriseEnCharge < 0){
-            throw new SaisieException("Error sur le taux de prise en charge : " + pTauxPriseEnCharge);
+    public void setMutTauxPriseEnCharge(double pMutTauxPriseEnCharge) throws SaisieException {
+        if (!positifInt(String.valueOf(pMutTauxPriseEnCharge)) && pMutTauxPriseEnCharge < 0){
+            throw new SaisieException("Error sur le taux de prise en charge : " + pMutTauxPriseEnCharge);
         }else{
-            this.tauxPriseEnCharge = pTauxPriseEnCharge;
+            this.mutTauxPriseEnCharge = pMutTauxPriseEnCharge;
         }
     }
 
@@ -124,14 +124,14 @@ public class Mutuelle {
     /**
      * Sets departement.
      *
-     * @param pNumDepartement      the departement
+     * @param pMutNumDepartement      the departement
      * @throws SaisieException  the saisie exception
      */
-    public void setMutNumDepartement(int pNumDepartement) throws SaisieException {
-        if (!positifInt(String.valueOf(pNumDepartement)) && pNumDepartement < 0){
-            throw new SaisieException("Error sur le numéro de departement : " + pNumDepartement);
+    public void setMutNumDepartement(int pMutNumDepartement) throws SaisieException {
+        if (!positifInt(String.valueOf(pMutNumDepartement)) && pMutNumDepartement < 0){
+            throw new SaisieException("Error sur le numéro de departement : " + pMutNumDepartement);
         }else{
-            this.mutNumDepartement = pNumDepartement;
+            this.mutNumDepartement = pMutNumDepartement;
         }
     }
 
@@ -158,12 +158,12 @@ public class Mutuelle {
     public String toString() {
         StringBuilder sbm = new StringBuilder();
         sbm.append("Mutuelle : ").append("\n");
-        sbm.append("- Nom : ").append(this.getNom()).append("\n");
+        sbm.append("- Nom : ").append(this.getMutNom()).append("\n");
         if (getLieu() != null) {
             sbm.append(getLieu().toString());
         }
         sbm.append("- Departement : ").append(this.getMutNumDepartement()).append("\n");
-        sbm.append("- Taux de prise en charge : ").append(this.getTauxPriseEnCharge()).append("\n");
+        sbm.append("- Taux de prise en charge : ").append(this.getMutTauxPriseEnCharge()).append("\n");
         return sbm.toString();
     }
 }
