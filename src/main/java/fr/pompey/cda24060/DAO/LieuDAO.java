@@ -17,9 +17,11 @@ public class LieuDAO extends InterfaceDAO<Lieu> {
      */
     @Override
     public Lieu create(Lieu lieu) throws SQLException {
-        String sql = "INSERT INTO Lieu (lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp) VALUES (?, ?, ?, ?, ?)";
+        StringBuilder sql = new StringBuilder();
+        sql.append("INSERT INTO Lieu (lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp) VALUES (?, ?, ?, ?, ?)");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql), Statement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, lieu.getAdresse());
             stmt.setString(2, lieu.getEmail());
             stmt.setString(3, lieu.getTelephone());
@@ -50,9 +52,11 @@ public class LieuDAO extends InterfaceDAO<Lieu> {
      */
     @Override
     public Lieu getById(int id) throws SQLException {
-        String sql = "SELECT Id_Lieu, lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp FROM Lieu WHERE Id_Lieu = ?";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT Id_Lieu, lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp FROM Lieu WHERE Id_Lieu = ?");
+        sql.toString();
 
-        try (PreparedStatement stmt = connection.prepareStatement(sql)) {
+        try (PreparedStatement stmt = connection.prepareStatement(String.valueOf(sql))) {
             stmt.setInt(1, id);
 
             try (ResultSet rs = stmt.executeQuery()) {
@@ -73,10 +77,12 @@ public class LieuDAO extends InterfaceDAO<Lieu> {
     @Override
     public List<Lieu> getAll() throws SQLException {
         List<Lieu> lieux = new ArrayList<>();
-        String sql = "SELECT Id_Lieu, lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp FROM Lieu ORDER BY lieu_ville";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT Id_Lieu, lieu_adresse, lieu_email, lieu_telephone, lieu_ville, lieu_cp FROM Lieu ORDER BY lieu_ville");
+        sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+                ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 lieux.add(extractLieuFromResultSet(rs));

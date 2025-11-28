@@ -212,9 +212,6 @@ public class OrdonnanceDAO extends InterfaceDAO<Ordonnance> {
         );
         ordonnance.setId_Ordonnance(rs.getInt("Id_Ordonnance"));
 
-        // Charger les médicaments associés à cette ordonnance si nécessaire
-        // ordonnance.setMedicaments(getMedicamentsByOrdonnance(ordonnance.getId_Ordonnance()));
-
         return ordonnance;
     }
 }

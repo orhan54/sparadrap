@@ -20,19 +20,31 @@ public abstract class Personne {
 
     /**
      * Constructeur pour Medecin (sans mutuelle ni medecin)
+     *
+     * @param pNom    the p nom
+     * @param pPrenom the p prenom
+     * @param lieu    the lieu
+     * @throws SaisieException the saisie exception
      */
-    public Personne(String nom, String prenom, Lieu lieu) throws SaisieException {
-        this.setNom(nom);
-        this.setPrenom(prenom);
+    public Personne(String pNom, String pPrenom, Lieu lieu) throws SaisieException {
+        this.setNom(pNom);
+        this.setPrenom(pPrenom);
         this.setLieu(lieu);
     }
 
     /**
      * Constructeur complet pour Patient
+     *
+     * @param pNom     the p nom
+     * @param pPrenom  the p prenom
+     * @param lieu     the lieu
+     * @param mutuelle the mutuelle
+     * @param medecin  the medecin
+     * @throws SaisieException the saisie exception
      */
-    public Personne(String nom, String prenom, Lieu lieu, Mutuelle mutuelle, Medecin medecin) throws SaisieException {
-        this.setNom(nom);
-        this.setPrenom(prenom);
+    public Personne(String pNom, String pPrenom, Lieu lieu, Mutuelle mutuelle, Medecin medecin) throws SaisieException {
+        this.setNom(pNom);
+        this.setPrenom(pPrenom);
         this.setLieu(lieu);
         this.setMutuelle(mutuelle);
         this.setMedecin(medecin);
@@ -96,10 +108,10 @@ public abstract class Personne {
     /**
      * Sets lieu.
      *
-     * @param pLieu the p lieu
+     * @param lieu the p lieu
      */
-    public void setLieu(Lieu pLieu) {
-        this.lieu = pLieu;
+    public void setLieu(Lieu lieu) {
+        this.lieu = lieu;
     }
 
     /**
@@ -114,10 +126,10 @@ public abstract class Personne {
     /**
      * Sets mutuelle.
      *
-     * @param pMutuelle the p mutuelle
+     * @param mutuelle the p mutuelle
      */
-    public void setMutuelle(Mutuelle pMutuelle) {
-        this.mutuelle = pMutuelle;
+    public void setMutuelle(Mutuelle mutuelle) {
+        this.mutuelle = mutuelle;
     }
 
     /**
@@ -132,10 +144,10 @@ public abstract class Personne {
     /**
      * Sets medecin.
      *
-     * @param pMedecin the p medecin
+     * @param medecin the p medecin
      */
-    public void setMedecin(Medecin pMedecin) {
-        this.medecin = pMedecin;
+    public void setMedecin(Medecin medecin) {
+        this.medecin = medecin;
     }
 
     @Override

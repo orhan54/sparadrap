@@ -21,7 +21,7 @@ public class Ordonnance {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public Ordonnance(Date date, String pNomMedecin, String pNomPatient,
-                      Medecin medecin, Patient patient) throws SaisieException {
+                    Medecin medecin, Patient patient) throws SaisieException {
         this.date = date;
         this.setNomMedecin(pNomMedecin);
         this.setNomPatient(pNomPatient);

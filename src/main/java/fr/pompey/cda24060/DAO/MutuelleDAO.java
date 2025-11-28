@@ -67,7 +67,7 @@ public class MutuelleDAO extends InterfaceDAO<Mutuelle> {
         sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
+                ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 mutuelles.add(extractMutuelleFromResultSet(rs));

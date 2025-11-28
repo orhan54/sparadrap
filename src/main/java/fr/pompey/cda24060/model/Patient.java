@@ -23,26 +23,49 @@ public class Patient extends Personne {
         super();
     }
 
-    // Constructeur principal
+    /**
+     * Instantiates a new Patient.
+     *
+     * @param pPatNom       the p pat nom
+     * @param pPatPrenom    the p pat prenom
+     * @param dateNaissance the date naissance
+     * @param lieu          the lieu
+     * @param mutuelle      the mutuelle
+     * @param medecin       the medecin
+     * @throws SaisieException the saisie exception
+     */
+// Constructeur principal
     public Patient(String pPatNom,
-                   String pPatPrenom,
-                   LocalDate dateNaissance,
-                   Lieu lieu,
-                   Mutuelle mutuelle,
-                   Medecin medecin) throws SaisieException {
+                    String pPatPrenom,
+                    LocalDate dateNaissance,
+                    Lieu lieu,
+                    Mutuelle mutuelle,
+                    Medecin medecin) throws SaisieException {
         super(pPatNom, pPatPrenom, lieu, mutuelle, medecin);
         this.patDateNaissance = Date.valueOf(dateNaissance);
         this.patNumSecu = generateNumSecu();
     }
 
-    // Constructeur alternatif pour DAO (numéro de sécu existant)
+    /**
+     * Instantiates a new Patient.
+     *
+     * @param pPatNom           the p pat nom
+     * @param pPatPrenom        the p pat prenom
+     * @param pPatDateNaissance the p pat date naissance
+     * @param lieu              the lieu
+     * @param mutuelle          the mutuelle
+     * @param medecin           the medecin
+     * @param pPatNumSecu       the p pat num secu
+     * @throws SaisieException the saisie exception
+     */
+// Constructeur alternatif pour DAO (numéro de sécu existant)
     public Patient(String pPatNom,
-                   String pPatPrenom,
-                   Date pPatDateNaissance,
-                   Lieu lieu,
-                   Mutuelle mutuelle,
-                   Medecin medecin,
-                   String pPatNumSecu) throws SaisieException {
+                    String pPatPrenom,
+                    Date pPatDateNaissance,
+                    Lieu lieu,
+                    Mutuelle mutuelle,
+                    Medecin medecin,
+                    String pPatNumSecu) throws SaisieException {
         super(pPatNom, pPatPrenom, lieu, mutuelle, medecin);
         this.patDateNaissance = pPatDateNaissance;
         this.patNumSecu = pPatNumSecu;

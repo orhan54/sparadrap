@@ -89,7 +89,7 @@ public class PatientDAO extends InterfaceDAO<Patient> {
         sql.toString();
 
         try (Statement stmt = connection.createStatement();
-             ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
+                ResultSet rs = stmt.executeQuery(String.valueOf(sql))) {
 
             while (rs.next()) {
                 patients.add(extractPatientFromResultSet(rs));

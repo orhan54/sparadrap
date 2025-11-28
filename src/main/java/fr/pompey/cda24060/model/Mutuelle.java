@@ -11,9 +11,9 @@ import static fr.pompey.cda24060.utility.RegexUtility.regexAlpha;
 public class Mutuelle {
 
     // Attribut de la classe Mutuelle
+    private int Id_Mutuelle ,mutNumDepartement;
     private String mutNom;
     private double mutTauxPriseEnCharge;
-    private int Id_Mutuelle ,mutNumDepartement;
     private Lieu lieu;
 
     // List des mutuelles
